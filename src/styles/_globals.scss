@@ -1,0 +1,9 @@
+// Global variables and module forwarding
+
+@forward 'fonts' as fonts-*;
+@forward 'colors' as color-*;
+
+$padding: 1rem;
+$spacing: 0.5rem;
+$input-height: 1.5rem;
+$navbar-height: 2rem;

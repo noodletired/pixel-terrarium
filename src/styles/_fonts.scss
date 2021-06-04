@@ -1,0 +1,15 @@
+// Font imports and variables
+@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+
+$family-default: Poppins, Helvetica, sans-serif;
+$family-headings: $family-default;
+
+$family-stylish: $family-headings;
+$family-basic: $family-default;
+$family-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+.font-stylish { font-family: $family-stylish !important }
+.font-basic { font-family: $family-basic !important }
+.font-mono { font-family: $family-mono !important }
+
+$size-base: 14px; //1rem
+$size-small: 0.8rem;

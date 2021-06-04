@@ -1,0 +1,24 @@
+{
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true,
+		"source.fixAll.stylelint": true
+	},
+	"editor.formatOnSave": false, // prevent vscode internally trying to break our styles
+	"eslint.codeActionsOnSave.mode": "all", // "problems" is faster but only fixes some
+	"eslint.workingDirectories": ["."],
+	"git.branchValidationRegex": "^[a-z0-9-]+$",
+	"javascript.validate.enable": false,
+	"npm.autoDetect": "on",
+	"npm.enableRunFromFolder": true,
+	"stylelint.configBasedir": ".",
+	"stylelint.configOverrides": {
+		"ignoreFiles": [
+			"node_modules",
+			"dist"
+		]
+	},
+	"stylelint.enable": true,
+	"typescript.validate.enable": false, // we use eslint for this
+	"css.validate": false,
+	"scss.validate": false
+}

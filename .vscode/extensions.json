@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"octref.vetur",
+		"mrmlnc.vscode-scss",
+		"ecmel.vscode-html-css",
+		"gencer.html-slim-scss-css-class-completion",
+		"dbaeumer.vscode-eslint",
+		"stylelint.vscode-stylelint"
+	]
+}
