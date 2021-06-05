@@ -1,26 +1,39 @@
 <template>
-<div id="app" ref="root" />
+<div id="app">
+	<canvas ref="canvas" />
+</div>
 </template>
 
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
-import { tilesPromise } from './lib/tileset';
-import { view } from './lib/pixi-app';
+import { Create } from './lib/PixiApp';
+import { tilesPromise } from './lib/Tileset';
+
+import './lib/Tilemap';
+
+import type { Application } from 'pixi.js';
+import type { Tiles } from './lib/Tileset';
 
 export default defineComponent({
 	name: 'application',
 
-	async setup()
+	setup()
 	{
-		const root = ref<HTMLDivElement | null>(null);
-		onMounted(() => root.value?.appendChild(view));
+		const canvas = ref<HTMLCanvasElement | null>(null);
+		const app = ref<Application | null>(null);
+		const tiles = ref<Tiles | null>(null);
+		onMounted(async () =>
+		{
+			console.log('mounted', canvas.value);
+			app.value = Create({ view: canvas.value! });
+			tiles.value = await tilesPromise;
+		});
 
-		const tiles = await tilesPromise;
 
 		// TODO: generate tilemap
 
-		return { tiles };
+		return { app, canvas, tiles };
 	}
 });
 </script>

@@ -16,6 +16,7 @@
 		"serve": "vite preview"
 	},
 	"dependencies": {
+		"open-simplex-noise": "^2.5.0",
 		"pixi.js": "^6.0.4",
 		"vue": "^3.0.5"
 	},

@@ -1,7 +1,7 @@
 // ESLint configuration options
 const e = 2; // error
 const w = 1; // warn
-//const o = 0; // off
+const o = 0; // off
 
 module.exports = {
 	env: {
@@ -36,7 +36,6 @@ module.exports = {
 		'array-element-newline': [e, 'consistent'],
 		'arrow-parens': [e, 'as-needed'],
 		'block-spacing': e,
-		'brace-style': [e, 'allman'], // maybe disable and use custom rules
 		'camelcase': [e, { allow: ['^[A-Z_]+$'] }], // allow CONST_
 		'curly': e,
 		'comma-dangle': [e, 'only-multiline', { functions: 'never' }],
@@ -44,7 +43,6 @@ module.exports = {
 		'eqeqeq': e,
 		'func-call-spacing': e,
 		'implicit-arrow-linebreak': e,
-		'indent': [e, 'tab', { SwitchCase: 1 }],
 		'key-spacing': e,
 		'keyword-spacing': [e, {
 			before: true,
@@ -59,7 +57,6 @@ module.exports = {
 			ignoreTemplateLiterals: true
 		}],
 		'new-cap': [e, { capIsNew: false }],
-		'no-duplicate-imports': [e, { includeExports: true }],
 		'no-multi-spaces': [e, { ignoreEOLComments: true }],
 		'no-multiple-empty-lines': [e, { max: 2, maxEOF: 0, maxBOF: 0 }],
 		'no-return-await': e,
@@ -74,7 +71,7 @@ module.exports = {
 		'object-curly-spacing': [e, 'always'],
 		'object-property-newline': [e, { allowAllPropertiesOnSameLine: true }],
 		'object-shorthand': [e, 'always', { avoidExplicitReturnArrows: true }],
-		'one-var': [e, 'never'],
+		'one-var': [e, { initialized: 'never', uninitialized: 'consecutive' }],
 		'padded-blocks': [e, 'never'],
 		'prefer-arrow-callback': e,
 		'prefer-destructuring': [e, { object: true, array: false }],
@@ -83,22 +80,42 @@ module.exports = {
 		'prefer-named-capture-group': w,
 		'prefer-regex-literals': w,
 		'prefer-template': w,
-		'quotes': [e, 'single', {
-			allowTemplateLiterals: true,
-			avoidEscape: true
-		}],
 		'quote-props': [e, 'consistent-as-needed', { keywords: false }],
 		'require-atomic-updates': e,
 		'require-await': e,
 		'semi': e,
 		'semi-spacing': e,
-		'space-before-function-paren': [e, { anonymous: 'never', named: 'never', asyncArrow: 'always' }],
 		'space-infix-ops': e,
 		'space-in-parens': [e, 'never'],
 		'space-unary-ops': [e, { words: true, nonwords: false }],
 		'sort-imports': [e, { allowSeparatedGroups: true }],
 		'template-curly-spacing': e,
 
+		/**
+		 * Add Typescript ESLint plugin overrides here
+		 * See https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin/docs/rules
+		 */
+		'brace-style': o,
+		'indent': o,
+		'no-duplicate-imports': o,
+		'quotes': o,
+		'space-before-function-paren': o,
+
+		'@typescript-eslint/brace-style': [e, 'allman'],
+		'@typescript-eslint/indent': [e, 'tab', { SwitchCase: 1 }],
+		'@typescript-eslint/no-duplicate-imports': ['error', { includeExports: true }],
+		'@typescript-eslint/no-non-null-assertion': o,
+		'@typescript-eslint/quotes': [e, 'single', {
+			allowTemplateLiterals: true,
+			avoidEscape: true
+		}],
+		'@typescript-eslint/space-before-function-paren': [e, { anonymous: 'never', named: 'never', asyncArrow: 'always' }],
+		'@typescript-eslint/type-annotation-spacing': e,
+
+		/**
+		 * Add Vue ESLint plugin overrides here
+		 * See https://eslint.vuejs.org/rules/
+		 */
 		'vue/block-tag-newline': e,
 		'vue/camelcase': [e, { allow: ['^[A-Z_]+$'] }],
 		'vue/component-definition-name-casing': [e, 'kebab-case'],
