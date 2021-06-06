@@ -10,13 +10,14 @@ import { Mask } from './helpers/Array2D';
 import type { TileType, Tiles } from './Tiles';
 import config from '/@/config';
 
-const width = 5;
-const height = 5;
+const width = 15;
+const height = 11;
 const land = new Container();
 const back = new Container();
 
-const landMask: Mask = Mask.From(Generate2D(width, height, 0.1).GreaterThan(0).Map(EllipseTest(width, height)));
-const rockMask: Mask = Generate2D(width, height, 0.4).GreaterThan(0.3);
+const circleMask: Mask = Mask.From(new Mask(width, height, true).Map(EllipseTest(width, height, 0, 0, 0.8)));
+const landMask: Mask = Generate2D(width, height, 0.5).GreaterThan(0).Intersect(circleMask);
+const rockMask: Mask = Generate2D(width, height, 0.3).GreaterThan(0);
 
 /**
  * Redraw
@@ -39,6 +40,7 @@ export const Redraw = (tiles: Tiles, { stage }: Application): void =>
 			return; // ignore
 		}
 
+		// Select the correct tile
 		const type: TileType = rockMask.GetAt(i) ? 'rock' : 'dirt';
 		const cardinals = CardinalsFromMask(landMask, row, col);
 		const tile = SelectTile(tiles, type, cardinals);
@@ -48,6 +50,7 @@ export const Redraw = (tiles: Tiles, { stage }: Application): void =>
 			return;
 		}
 
+		// Position and scale the tile
 		tile.scale.set(scale, scale);
 		tile.position.set(col * scale * tileSize.width, row * scale * tileSize.height);
 

@@ -57,7 +57,6 @@ export const SelectTile = (tiles: Tiles, type: TileType, cardinals: Cardinals): 
 	}
 
 	// Select tile suffix option
-	console.log(bitmaskIndex);
 	const options = bitmask[bitmaskIndex];
 	let option: string;
 	if (Array.isArray(options))

@@ -61,7 +61,6 @@ export const CardinalsFromMask = (
 	boundaryCondition: boolean | 'wrap' = false): Cardinals =>
 {
 	const wrap = boundaryCondition === 'wrap';
-	console.log(row, col);
 	const boundN = row === 0;
 	const boundE = col === mask.width - 1;
 	const boundS = row === mask.height - 1;

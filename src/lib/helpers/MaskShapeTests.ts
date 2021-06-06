@@ -20,10 +20,10 @@ export const EllipseTest = (
 	scaleY = 1.0
 ): Array2DTest<unknown> =>
 {
-	const cx = Math.floor(width / 2) + offsetX;
-	const cy = Math.floor(height / 2) + offsetY;
-	const a2 = ((width - (cx + 1)) * scaleX) ** 2;
-	const b2 = ((height - (cy + 1)) * scaleY) ** 2;
+	const cx = width / 2 + offsetX;
+	const cy = height / 2 + offsetY;
+	const a2 = ((width - cx) * scaleX) ** 2;
+	const b2 = ((height - cy) * scaleY) ** 2;
 
 	return (value, i, row, col): boolean =>
 	{
