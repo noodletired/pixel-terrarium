@@ -101,6 +101,7 @@ module.exports = {
 		'quotes': o,
 		'space-before-function-paren': o,
 
+		'@typescript-eslint/ban-ts-comment': o,
 		'@typescript-eslint/brace-style': [e, 'allman'],
 		'@typescript-eslint/indent': [e, 'tab', { SwitchCase: 1 }],
 		'@typescript-eslint/no-duplicate-imports': ['error', { includeExports: true }],

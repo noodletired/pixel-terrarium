@@ -18,14 +18,14 @@ export const EllipseTest = (
 	offsetY = 0,
 	scaleX = 1.0,
 	scaleY = 1.0
-) : Array2DTest<unknown> =>
+): Array2DTest<unknown> =>
 {
 	const cx = Math.floor(width / 2) + offsetX;
 	const cy = Math.floor(height / 2) + offsetY;
 	const a2 = ((width - (cx + 1)) * scaleX) ** 2;
 	const b2 = ((height - (cy + 1)) * scaleY) ** 2;
 
-	return (value, i, row, col) : boolean =>
+	return (value, i, row, col): boolean =>
 	{
 		return ((row - cy) ** 2 / b2) + ((col - cx) ** 2 / a2) < 1;
 	};

@@ -1,6 +1,4 @@
-import copy from 'rollup-plugin-copy';
 import { defineConfig } from 'vite';
-import externals from 'vite-plugin-resolve-externals';
 import path from 'path';
 import viteStylelint from '@amatlash/vite-plugin-stylelint';
 import vue from '@vitejs/plugin-vue';
@@ -11,7 +9,6 @@ import vue from '@vitejs/plugin-vue';
  */
 export default defineConfig({
 	plugins: [
-		externals(),
 		vue()
 	],
 
@@ -19,8 +16,7 @@ export default defineConfig({
 		alias: [{
 			find: '/@',
 			replacement: path.resolve(__dirname, 'src')
-		}],
-		externals: { config: 'config' }
+		}]
 	},
 
 	css: {
@@ -36,12 +32,6 @@ export default defineConfig({
 		// https://rollupjs.org/guide/en/#big-list-of-options
 		rollupOptions: {
 			plugins: [
-				copy({
-					hook: 'writeBundle',
-					targets: [
-						{ src: './config.js', dest: 'dist' },
-					]
-				}),
 				viteStylelint()
 			]
 		}

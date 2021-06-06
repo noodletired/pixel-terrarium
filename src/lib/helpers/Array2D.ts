@@ -1,20 +1,24 @@
+// Helper types
+export type Array2DGenerator<T> = (i: number, row: number, col: number) => T;
+export type Array2DTest<T> = (field: T, i: number, row: number, col: number) => boolean;
+
 /**
  * Array2D
  * A 2D collection.
  */
-export type Array2DGenerator<T> = (i?: number, row?: number, col?: number) => T;
-export type Array2DTest<T> = (field?: T, i?: number, row?: number, col?: number) => boolean;
 export class Array2D<T>
 {
 	readonly width: number
 	readonly height: number;
-	protected readonly fields: T[];
+	readonly fields: T[];
 
-	constructor(width: number, height: number, initialiser: T[] | Array2DGenerator<T> | T)
+	constructor(width: number, height: number, initialiser: T | T[] | Array2DGenerator<T>)
 	{
 		this.width = width;
 		this.height = height;
 		this.fields = new Array<T>(width * height);
+
+		const IsGenerator = (arg: unknown): arg is Array2DGenerator<unknown> => typeof arg === 'function';
 
 		// Array type
 		if (Array.isArray(initialiser))
@@ -23,7 +27,7 @@ export class Array2D<T>
 		}
 
 		// Function type
-		else if (typeof initialiser === 'function')
+		else if (IsGenerator(initialiser))
 		{
 			let i = 0;
 			for (let row = 0; row < height; ++row)
@@ -36,7 +40,7 @@ export class Array2D<T>
 			}
 		}
 
-		// Value type
+		// Value type, unsupported
 		else
 		{
 			this.fields.fill(initialiser);
@@ -95,7 +99,7 @@ export class Array2D<T>
 	 * @param Functor Function to apply.
 	 * @returns new Array2D with the result.
 	 */
-	Map<U>(Functor: (field?: T, i?: number, row?: number, col?: number) => U): Array2D<U>
+	Map<U>(Functor: (field: T, i: number, row: number, col: number) => U): Array2D<U>
 	{
 		const fields = new Array<U>(this.width * this.height);
 		let i = 0;
@@ -116,7 +120,7 @@ export class Array2D<T>
 	 * Runs a function for every field.
 	 * @param Functor Function to apply.
 	 */
-	ForEach(Functor: (field: T, i?: number, row?: number, col?: number) => U): void
+	ForEach(Functor: (field: T, i: number, row: number, col: number) => void): void
 	{
 		let i = 0;
 		for (let row = 0; row < this.height; ++row)
@@ -147,6 +151,17 @@ export class Array2D<T>
 export class Mask extends Array2D<boolean>
 {
 	/**
+	 * From
+	 * Converts an Array2D to a Mask.
+	 * @param base
+	 * @returns
+	 */
+	static From(base: Array2D<boolean>): Mask
+	{
+		return new Mask(base.width, base.height, base.fields);
+	}
+
+	/**
 	 * Intersect
 	 * Produces the binary AND between Masks.
 	 * @param rhs Other Mask to compare to.
@@ -154,7 +169,7 @@ export class Mask extends Array2D<boolean>
 	 */
 	Intersect(rhs: Mask): Mask
 	{
-		return this.Map((bit, i) => bit && rhs.fields[i]);
+		return Mask.From(this.Map((bit, i) => bit && rhs.fields[i]));
 	}
 
 	/**
@@ -165,7 +180,7 @@ export class Mask extends Array2D<boolean>
 	 */
 	Union(rhs: Mask): Mask
 	{
-		return this.Map((bit, i) => bit || rhs.fields[i]);
+		return Mask.From(this.Map((bit, i) => bit || rhs.fields[i]));
 	}
 }
 
@@ -177,6 +192,17 @@ export class Mask extends Array2D<boolean>
 export class Bitmap extends Array2D<number>
 {
 	/**
+	 * From
+	 * Converts an Array2D to a Mask.
+	 * @param base
+	 * @returns
+	 */
+	static From(base: Array2D<number>): Bitmap
+	{
+		return new Bitmap(base.width, base.height, base.fields);
+	}
+
+	/**
 	 * LessThan
 	 * Produces the result of a logical less-than operation.
 	 * @param rhs Another Bitmap, or a single value to compare to.
@@ -186,11 +212,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return this.Map((value, i) => value < rhs.fields[i]);
+			return Mask.From(this.Map((value, i) => value < rhs.fields[i]));
 		}
 		else
 		{
-			return this.Map(value => value < rhs);
+			return Mask.From(this.Map(value => value < rhs));
 		}
 	}
 
@@ -204,11 +230,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return this.Map((value, i) => value < rhs.fields[i]);
+			return Mask.From(this.Map((value, i) => value > rhs.fields[i]));
 		}
 		else
 		{
-			return this.Map(value => value < rhs);
+			return Mask.From(this.Map(value => value > rhs));
 		}
 	}
 
@@ -222,11 +248,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return this.Map((value, i) => clamping.Clamp(value + rhs.fields[i]));
+			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value + rhs.fields[i])));
 		}
 		else
 		{
-			return this.Map(value => clamping.Clamp(value + rhs));
+			return Bitmap.From(this.Map(value => clamping.Clamp(value + rhs)));
 		}
 	}
 
@@ -240,11 +266,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return this.Map((value, i) => clamping.Clamp(value - rhs.fields[i]));
+			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value - rhs.fields[i])));
 		}
 		else
 		{
-			return this.Map(value => clamping.Clamp(value - rhs));
+			return Bitmap.From(this.Map(value => clamping.Clamp(value - rhs)));
 		}
 	}
 
@@ -258,11 +284,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return this.Map((value, i) => clamping.Clamp(value * rhs.fields[i]));
+			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value * rhs.fields[i])));
 		}
 		else
 		{
-			return this.Map(value => clamping.Clamp(value * rhs));
+			return Bitmap.From(this.Map(value => clamping.Clamp(value * rhs)));
 		}
 	}
 }
@@ -280,6 +306,10 @@ export class Clamp
 	static readonly POSITIVE = new Clamp(0);
 	static readonly POSITIVE_NONZERO = new Clamp(1);
 
+	min: number;
+	max: number;
+	wrap: boolean;
+
 	constructor(min = -Infinity, max = Infinity, wrap = false)
 	{
 		this.min = min;
@@ -295,7 +325,7 @@ export class Clamp
 	 */
 	Clamp(value: number): number
 	{
-		if (!Number.isFinite(value) || Number.isNaN())
+		if (!Number.isFinite(value) || Number.isNaN(value))
 		{
 			throw new RangeError(`Value ${value} must be finite and real.`);
 		}

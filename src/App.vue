@@ -7,13 +7,11 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
-import { Create } from './lib/PixiApp';
+import config from './config';
+
+import { Create, Render } from './lib/PixiApp';
+import { Redraw } from './lib/Tilemap';
 import { tilesPromise } from './lib/Tileset';
-
-import './lib/Tilemap';
-
-import type { Application } from 'pixi.js';
-import type { Tiles } from './lib/Tileset';
 
 export default defineComponent({
 	name: 'application',
@@ -21,23 +19,40 @@ export default defineComponent({
 	setup()
 	{
 		const canvas = ref<HTMLCanvasElement | null>(null);
-		const app = ref<Application | null>(null);
-		const tiles = ref<Tiles | null>(null);
+
 		onMounted(async () =>
 		{
-			console.log('mounted', canvas.value);
-			app.value = Create({ view: canvas.value! });
-			tiles.value = await tilesPromise;
-		});
+			let app = Create({
+				backgroundAlpha: config.transparent ? 0 : 1,
+				view: canvas.value!
+			});
 
+			let tiles = await tilesPromise;
+
+			Redraw(tiles, app);
+			Render();
+		});
 
 		// TODO: generate tilemap
 
-		return { app, canvas, tiles };
+		return { canvas };
 	}
 });
 </script>
 
 
 <style scoped lang="scss">
+#app {
+	$color-1: hsl(273, 12%, 18%);
+	$color-2: hsl(207, 32%, 23%);
+	background: linear-gradient($color-1, $color-2);
+}
+
+canvas {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	border: solid 1px hsl(0, 0%, 90%);
+}
 </style>

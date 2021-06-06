@@ -29,7 +29,7 @@ export const tilesPromise = new Promise<Tiles>(resolve =>
 				}
 
 				const frame = new Rectangle(x * tileSize.width, y * tileSize.height, tileSize.width, tileSize.height);
-				const texture = new Texture(atlas, frame);
+				const texture = new Texture(atlas.baseTexture, frame);
 				tiles.set(tileName, texture);
 			}
 		}
