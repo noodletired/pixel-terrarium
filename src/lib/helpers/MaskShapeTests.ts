@@ -20,8 +20,8 @@ export const EllipseTest = (
 	scaleY = 1.0
 ): Array2DTest<unknown> =>
 {
-	const cx = width / 2 + offsetX;
-	const cy = height / 2 + offsetY;
+	const cx = width / 2 + offsetX - 0.5; // subtract half to centre on grid
+	const cy = height / 2 + offsetY - 0.5;
 	const a2 = ((width - cx) * scaleX) ** 2;
 	const b2 = ((height - cy) * scaleY) ** 2;
 

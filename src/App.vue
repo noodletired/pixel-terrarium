@@ -29,7 +29,7 @@ export default defineComponent({
 
 			let tiles = await tilesPromise;
 
-			Redraw(tiles, app);
+			Redraw(tiles, app.stage);
 			Render();
 		});
 

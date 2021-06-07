@@ -1,5 +1,5 @@
 [
-	"void",    "dirt-hl", "dirt-hr", null,      "rock-hl",  "rock-hr",  "dark-tl", "dark-t",  "dark-tr", "dark-vt",
+	"void",    "dirt-hl", "dirt-hr", null,      "rock-hl", "rock-hr", "dark-tl", "dark-t",  "dark-tr", "dark-vt",
 	"dirt-c",  "dirt-vb", "dirt-vt", "rock-c",  "rock-vb", "rock-vt", "dark-l",  "dark",    "dark-r",  "dark-v",
 	"dirt-tl", "dirt-t",  "dirt-tr", "rock-tl", "rock-t",  "rock-tr", "dark-bl", "dark-b",  "dark-br", "dark-vb",
 	"dirt-bl", "dirt",    "dirt-br", "rock-bl", "rock",    "rock-br", "dark-hl", "dark-h",  "dark-hr", "dark-c",

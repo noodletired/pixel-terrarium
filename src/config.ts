@@ -1,4 +1,7 @@
 export default {
 	transparent: true,
-	tileScale: 10,
+
+	tileScale: 5,
+	worldWidth: 32,
+	worldHeight: 24,
 } as const;

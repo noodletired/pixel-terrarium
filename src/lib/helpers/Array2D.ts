@@ -2,6 +2,10 @@
 export type Array2DGenerator<T> = (i: number, row: number, col: number) => T;
 export type Array2DTest<T> = (field: T, i: number, row: number, col: number) => boolean;
 
+// Helper functions
+const IsGenerator = (arg: unknown): arg is Array2DGenerator<unknown> => typeof arg === 'function';
+const IsArray = Array.isArray;
+
 /**
  * Array2D
  * A 2D collection.
@@ -18,14 +22,11 @@ export class Array2D<T>
 		this.height = height;
 		this.fields = new Array<T>(width * height);
 
-		const IsGenerator = (arg: unknown): arg is Array2DGenerator<unknown> => typeof arg === 'function';
-
 		// Array type
-		if (Array.isArray(initialiser))
+		if (IsArray(initialiser))
 		{
 			this.fields = initialiser;
 		}
-
 		// Function type
 		else if (IsGenerator(initialiser))
 		{
@@ -39,7 +40,6 @@ export class Array2D<T>
 				}
 			}
 		}
-
 		// Value type, unsupported
 		else
 		{
@@ -53,7 +53,7 @@ export class Array2D<T>
 	 */
 	RowColToIndex(row: number, col: number): number
 	{
-		if (row > this.height || col > this.width || row < 0 || col < 0)
+		if (row >= this.height || col >= this.width || row < 0 || col < 0)
 		{
 			throw new RangeError(`Row or column indices out of bounds (${row}, ${col})`);
 		}
@@ -150,6 +150,29 @@ export class Array2D<T>
  */
 export class Mask extends Array2D<boolean>
 {
+	constructor(
+		width: number,
+		height: number,
+		initialiser: boolean|number | boolean[]|number[] | Array2DGenerator<boolean>
+	)
+	{
+		// Array type
+		if (IsArray(initialiser))
+		{
+			super(width, height, initialiser.map(value => !!value));
+		}
+		// Function type
+		else if (IsGenerator(initialiser))
+		{
+			super(width, height, initialiser);
+		}
+		// Value type
+		else
+		{
+			super(width, height, !!initialiser);
+		}
+	}
+
 	/**
 	 * From
 	 * Converts an Array2D to a Mask.
@@ -182,6 +205,98 @@ export class Mask extends Array2D<boolean>
 	{
 		return Mask.From(this.Map((bit, i) => bit || rhs.fields[i]));
 	}
+
+	/**
+	 * Complement
+	 * Inverts every bit.
+	 * @returns new Mask with the result.
+	 */
+	Complement(): Mask
+	{
+		return Mask.From(this.Map(bit => !bit));
+	}
+
+	/**
+	 * Erode
+	 * Produces the morphological erosion result using another Mask as a kernel.
+	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
+	 * @returns new Mask with the result.
+	 */
+	Erode(kernel: Mask, includeEdges = true): Mask
+	{
+		const kL = -Math.floor(kernel.width / 2);
+		const kR = Math.ceil(kernel.width / 2);
+		const kU = -Math.floor(kernel.height / 2);
+		const kD = Math.ceil(kernel.height / 2);
+
+		return Mask.From(this.Map((bit, i, row, col): boolean =>
+		{
+			for (let kCol = kL; kCol < kR; ++kCol)
+			{
+				for (let kRow = kU; kRow < kD; ++kRow)
+				{
+					const kernelBit = kernel.GetAt(kRow - kU, kCol - kL);
+					if (!kernelBit) // ignore zeros in kernel
+					{
+						continue;
+					}
+
+					// Edge condition
+					let testBit: boolean;
+					const testCol = col + kCol;
+					const testRow = row + kRow;
+					if (testRow < 0 || testRow >= this.height || testCol < 0 || testCol >= this.width)
+					{
+						testBit = includeEdges;
+					}
+					else
+					{
+						testBit = this.GetAt(row + kRow, col + kCol);
+					}
+
+					// Exit early if any bit under the kernel is false
+					if (!testBit)
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}));
+	}
+
+	/**
+	 * Dilate
+	 * Produces the morphological dilation result using another Mask as a kernel.
+	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
+	 * @returns new Mask with the result.
+	 */
+	Dilate(kernel: Mask): Mask
+	{
+		return this.Complement().Erode(kernel).Complement();
+	}
+
+	/**
+	 * Open
+	 * Produces the morphological opening result using another Mask as a kernel.
+	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
+	 * @returns new Mask with the result.
+	 */
+	Open(kernel: Mask): Mask
+	{
+		return this.Erode(kernel).Dilate(kernel);
+	}
+
+	/**
+	 * Close
+	 * Produces the morphological closing result using another Mask as a kernel.
+	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
+	 * @returns new Mask with the result.
+	 */
+	Close(kernel: Mask): Mask
+	{
+		return this.Dilate(kernel).Erode(kernel);
+	}
 }
 
 
@@ -191,6 +306,29 @@ export class Mask extends Array2D<boolean>
  */
 export class Bitmap extends Array2D<number>
 {
+	constructor(
+		width: number,
+		height: number,
+		initialiser: boolean|number | boolean[]|number[] | Array2DGenerator<number>
+	)
+	{
+		// Array type
+		if (IsArray(initialiser))
+		{
+			super(width, height, initialiser.map(value => +value));
+		}
+		// Function type
+		else if (IsGenerator(initialiser))
+		{
+			super(width, height, initialiser);
+		}
+		// Value type
+		else
+		{
+			super(width, height, +initialiser);
+		}
+	}
+
 	/**
 	 * From
 	 * Converts an Array2D to a Mask.

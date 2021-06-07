@@ -12,8 +12,8 @@ export const tilesPromise = new Promise<Tiles>(resolve =>
 	assets.add(tilesetURL).load(() =>
 	{
 		const atlas = utils.TextureCache[tilesetURL];
-		const rows = Math.floor(atlas.width / tileSize.width);
-		const cols = Math.floor(atlas.height / tileSize.height);
+		const cols = Math.floor(atlas.width / tileSize.width);
+		const rows = Math.floor(atlas.height / tileSize.height);
 
 		// Populate tiles map from tileNames
 		const tiles: Tiles = new Map();
@@ -21,7 +21,7 @@ export const tilesPromise = new Promise<Tiles>(resolve =>
 		{
 			for (let x = 0; x < cols; ++x)
 			{
-				const index = y * rows + x;
+				const index = y * cols + x;
 				const tileName = tileNames[index];
 				if (!tileName)
 				{
