@@ -5,7 +5,7 @@ settings.SCALE_MODE = SCALE_MODES.NEAREST;
 export let app: Application | null;
 export const assets = new Loader();
 
-export const Create = (options: IApplicationOptions): Application =>
+export const CreatePixiApp = (options: IApplicationOptions): Application =>
 {
 	app = new Application(options);
 	return app;

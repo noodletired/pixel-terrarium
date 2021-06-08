@@ -1,4 +1,4 @@
-import { Array2DTest } from './Array2D';
+import type { Array2DTest } from '../types/Array2D';
 
 /**
  * EllipseTest

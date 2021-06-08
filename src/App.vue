@@ -9,9 +9,8 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import config from './config';
 
-import { Create, Render } from './lib/PixiApp';
-import { Redraw } from './lib/Tilemap';
-import { tilesPromise } from './lib/Tileset';
+import { BlitWorld, GenerateWorld } from './lib/World';
+import { CreatePixiApp, Render } from './lib/PixiApp';
 
 export default defineComponent({
 	name: 'application',
@@ -19,17 +18,16 @@ export default defineComponent({
 	setup()
 	{
 		const canvas = ref<HTMLCanvasElement | null>(null);
+		const world = GenerateWorld();
 
-		onMounted(async () =>
+		onMounted(() =>
 		{
-			let app = Create({
+			let app = CreatePixiApp({
 				backgroundAlpha: config.transparent ? 0 : 1,
 				view: canvas.value!
 			});
 
-			let tiles = await tilesPromise;
-
-			Redraw(tiles, app.stage);
+			BlitWorld(world, app.stage);
 			Render();
 		});
 

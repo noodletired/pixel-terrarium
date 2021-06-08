@@ -1,10 +1,18 @@
+import { Clamp } from './Clamp';
+export { Clamp };
+
 // Helper types
 export type Array2DGenerator<T> = (i: number, row: number, col: number) => T;
 export type Array2DTest<T> = (field: T, i: number, row: number, col: number) => boolean;
 
 // Helper functions
-const IsGenerator = (arg: unknown): arg is Array2DGenerator<unknown> => typeof arg === 'function';
-const IsArray = Array.isArray;
+export const IsGenerator = (arg: unknown): arg is Array2DGenerator<unknown> => typeof arg === 'function';
+export const IsArray = Array.isArray;
+export const IsPrimitive = (arg: unknown): boolean =>
+{
+	const type = typeof arg;
+	return type === 'string' || type === 'boolean' || type === 'number';
+};
 
 /**
  * Array2D
@@ -141,6 +149,46 @@ export class Array2D<T>
 	{
 		return this.width === width && this.height === height;
 	}
+
+	/**
+	 * Reflect
+	 * Flips about its origin. Useful for kernels.
+	 * @param x Mirror about x axis, i.e. --
+	 * @param y Mirror about y axis, i.e. |
+	 * @returns new Mask with the result.
+	 */
+	Reflect(x = true, y = true): this
+	{
+		const Constructor = (this.constructor as any); // eslint-disable-line
+		if (x && y)
+		{
+			return new Constructor(this.width, this.height, [...this.fields].reverse());
+		}
+		else if (x)
+		{
+			const fields: T[] = [];
+			for (let row = 0; row < this.height; ++row)
+			{
+				const rowStart = row * this.width;
+				fields.push(...this.fields.slice(rowStart, rowStart + this.width).reverse());
+			}
+			return new Constructor(this.width, this.height, fields);
+		}
+		else
+		{
+			const fields: T[] = new Array<T>(this.fields.length);
+			for (let col = 0; col < this.width; ++col)
+			{
+				for (let row = this.height - 1; row >= 0; --row)
+				{
+					const i = row * this.width + col;
+					const j = (this.height - row - 1) * this.width + col;
+					fields[j] = this.fields[i];
+				}
+			}
+			return new Constructor(this.width, this.height, fields);
+		}
+	}
 }
 
 
@@ -231,9 +279,9 @@ export class Mask extends Array2D<boolean>
 
 		return Mask.From(this.Map((bit, i, row, col): boolean =>
 		{
-			for (let kCol = kL; kCol < kR; ++kCol)
+			for (let kRow = kU; kRow < kD; ++kRow)
 			{
-				for (let kRow = kU; kRow < kD; ++kRow)
+				for (let kCol = kL; kCol < kR; ++kCol)
 				{
 					const kernelBit = kernel.GetAt(kRow - kU, kCol - kL);
 					if (!kernelBit) // ignore zeros in kernel
@@ -273,7 +321,7 @@ export class Mask extends Array2D<boolean>
 	 */
 	Dilate(kernel: Mask): Mask
 	{
-		return this.Complement().Erode(kernel).Complement();
+		return this.Complement().Erode(kernel.Reflect()).Complement();
 	}
 
 	/**
@@ -296,6 +344,17 @@ export class Mask extends Array2D<boolean>
 	Close(kernel: Mask): Mask
 	{
 		return this.Dilate(kernel).Erode(kernel);
+	}
+
+	/**
+	 * HitOrMiss
+	 * Applies the morphological hit-or-miss transform with two disjoint kernels.
+	 * @param hitKernel Mask to include.
+	 * @param missKernel Mask to exclude.
+	 */
+	HitOrMiss(hitKernel: Mask, missKernel: Mask = hitKernel.Complement()): Mask
+	{
+		return this.Erode(hitKernel).Intersect(this.Complement().Erode(missKernel));
 	}
 }
 
@@ -427,61 +486,6 @@ export class Bitmap extends Array2D<number>
 		else
 		{
 			return Bitmap.From(this.Map(value => clamping.Clamp(value * rhs)));
-		}
-	}
-}
-
-
-/**
- * Clamp
- * Set of rules to Map during clamping.
- */
-export class Clamp
-{
-	static readonly NONE = new Clamp();
-	static readonly UINT8 = new Clamp(0, 255, true);
-	static readonly INT8 = new Clamp(-128, 127, true);
-	static readonly POSITIVE = new Clamp(0);
-	static readonly POSITIVE_NONZERO = new Clamp(1);
-
-	min: number;
-	max: number;
-	wrap: boolean;
-
-	constructor(min = -Infinity, max = Infinity, wrap = false)
-	{
-		this.min = min;
-		this.max = max;
-		this.wrap = wrap;
-	}
-
-	/**
-	 * Clamp
-	 * Applies clamping rules to a value.
-	 * @param value Value to clamp.
-	 * @returns clamped value.
-	 */
-	Clamp(value: number): number
-	{
-		if (!Number.isFinite(value) || Number.isNaN(value))
-		{
-			throw new RangeError(`Value ${value} must be finite and real.`);
-		}
-
-		if (this.wrap)
-		{
-			if (value < this.min)
-			{
-				return this.max - (this.min - value) % (this.max - this.min);
-			}
-			else
-			{
-				return this.min + (value - this.min) % (this.max - this.min);
-			}
-		}
-		else
-		{
-			return Math.max(this.min, Math.min(this.max, value));
 		}
 	}
 }

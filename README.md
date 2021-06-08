@@ -12,11 +12,13 @@ Install nodejs/npm and required packages on Ubuntu 18.04 with the command:
 ```
 
 ### Compile and hot-reload for development
+**NOTE: Vite/esbuild [currently does not support bundling top-level awaits](https://github.com/evanw/esbuild/issues/253); bundling will fail until this feature is added (or I refactor tileset loading).**
 ```
 npm run dev
 ```
 
 ### Bundle for production
+
 ```
 npm run build
 ```

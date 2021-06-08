@@ -12,6 +12,11 @@ export default defineConfig({
 		vue()
 	],
 
+	esbuild: {
+		format: 'esm',
+		// Other ESBuild options
+	},
+
 	resolve: {
 		alias: [{
 			find: '/@',

@@ -1,6 +1,7 @@
 import { makeNoise2D } from 'open-simplex-noise';
 
-import { Bitmap, Clamp } from './Array2D';
+import { Bitmap, Clamp, IsArray } from '../types/Array2D';
+export { Bitmap, Clamp };
 
 /**
  * Generate2D
@@ -15,16 +16,18 @@ import { Bitmap, Clamp } from './Array2D';
 export const Generate2D = (
 	width: number,
 	height: number,
-	frequency: number,
+	frequency: number | [number, number],
 	scale = 1.0,
 	clamping: Clamp = Clamp.NONE,
 	normalize = true
 ): Bitmap =>
 {
-	const seed = Date.now();
+	const seed = 1;//Date.now();
+	const xF = IsArray(frequency) ? frequency[0] : frequency;
+	const yF = IsArray(frequency) ? frequency[1] : frequency;
 	const Simplex = makeNoise2D(seed);
 
 	return new Bitmap(width, height, (i, row, col) => clamping.Clamp(
-		Simplex(col * frequency, row * frequency)) * scale * (normalize ? Math.SQRT2 : 1)
+		Simplex(col * xF, row * yF)) * scale * (normalize ? Math.SQRT2 : 1)
 	);
 };

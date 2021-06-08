@@ -44,7 +44,6 @@ export class Cardinals
 	}
 }
 
-
 /**
  * CardinalsFromMask
  * Determines cardinal adjacencies for a single tile/field in a Mask.
