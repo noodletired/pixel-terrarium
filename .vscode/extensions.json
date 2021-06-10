@@ -5,6 +5,7 @@
 		"ecmel.vscode-html-css",
 		"gencer.html-slim-scss-css-class-completion",
 		"dbaeumer.vscode-eslint",
-		"stylelint.vscode-stylelint"
+		"stylelint.vscode-stylelint",
+		"slevesque.shader"
 	]
 }

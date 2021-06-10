@@ -3,18 +3,16 @@ import config from '/@/config';
 
 import { CreateTileSprite, tileSize } from './Tileset';
 
-import { Array2D, Mask } from './types/Array2D';
 import { CardinalsFromMask } from './types/Cardinals';
+import { Mask } from './types/Array2D';
 
 import GenerateBack from './generation/Background';
+import GenerateFoliage from './generation/Foliage';
 import GenerateLand from './generation/Land';
 
-import type { Tile } from './types/Tile';
-import type { TileType } from './Tileset';
+import type { Tile, TileType, World } from './types/World';
 
 export type { Tile, TileType };
-export type WorldLayer = Array2D<Tile>;
-export type World = WorldLayer[];
 
 const { tileScale } = config;
 
@@ -30,8 +28,10 @@ export const GenerateWorld = (): World =>
 	const layers: World = [];
 
 	// Generate layers
-	layers.push(GenerateBack());
-	layers.push(GenerateLand());
+	const back = GenerateBack();
+	const land = GenerateLand();
+	const foliage = GenerateFoliage(land);
+	layers.push(back, land, foliage);
 
 	return layers;
 };

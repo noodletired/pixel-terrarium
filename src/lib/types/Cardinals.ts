@@ -13,13 +13,14 @@ export class Cardinals
 	west: boolean;
 
 	constructor(binary: string);
+	constructor(binary: number);
 	constructor(north: boolean, east: boolean, south: boolean, west: boolean);
-	constructor(...args: [string] | [boolean, boolean, boolean, boolean])
+	constructor(...args: [string] | [number] | [boolean, boolean, boolean, boolean])
 	{
 		if (args.length === 1)
 		{
-			const [binary] = args;
-			const n = parseInt(binary, 2);
+			const [value] = args;
+			const n = typeof value === 'string' ? parseInt(value, 2) : value;
 			this.north = !!(n & 1);
 			this.east = !!(n & 2);
 			this.south = !!(n & 4);

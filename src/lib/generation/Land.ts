@@ -7,7 +7,7 @@ import { Generate2D } from '../helpers/Noise';
 import { Tile, TileType } from '../types/Tile';
 import { CardinalsFromMask } from '../types/Cardinals';
 
-import type { WorldLayer } from '../World';
+import type { WorldLayer } from '../types/World';
 
 const width = config.worldWidth;
 const height = config.worldHeight;

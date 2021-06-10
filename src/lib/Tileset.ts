@@ -16,8 +16,8 @@ export type { Sprite, Texture };
 
 export type Tileset = Map<string, Texture>;
 export type BitmaskTileLookup = Record<string, string | string[]>; // look up one or more tile suffixes based on Cardinals
-export type TileType = 'dirt' | 'rock' | 'vine' | 'dark' | 'back' | 'void';
-export type BitmaskType = '11' | '13' | '16' | 'none';
+export type TileType = 'dirt' | 'rock' | 'vine' | 'dark' | 'back' | 'root' | 'void';
+export type BitmaskType = '11' | '13' | '16' | `indexed-${number}` | 'none';
 
 export const tileBitmaskType: Record<TileType, BitmaskType> = {
 	dirt: '11',
@@ -25,6 +25,7 @@ export const tileBitmaskType: Record<TileType, BitmaskType> = {
 	vine: '13',
 	dark: '16',
 	back: '16',
+	root: 'indexed-5',
 	void: 'none'
 } as const;
 export const tileSize = { width: config.tileWidth, height: config.tileHeight } as const;
@@ -79,7 +80,6 @@ export const tileset = await new Promise<Tileset>(resolve =>
  */
 export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite | null =>
 {
-	const bitmaskIndex = cardinals.asBinaryString;
 	const maskType = tileBitmaskType[type];
 
 	// Select bitmask
@@ -95,11 +95,16 @@ export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite |
 		case '16':
 			bitmask = <BitmaskTileLookup>bitmask16;
 			break;
+		case maskType.startsWith('indexed') && maskType: {
+			const size = parseInt(/indexed-(?<size>\d+)/.exec(maskType)?.groups.size ?? 0);
+			bitmask = <BitmaskTileLookup>{ '0000': [...Array(size).fill(0).map((_, i) => `-${i}`)] };
+		} break;
 		default:
 			return null; // none
 	}
 
 	// Select tile suffix option
+	const bitmaskIndex = cardinals.asBinaryString;
 	const options = bitmask[bitmaskIndex];
 	let option: string;
 	if (Array.isArray(options))
