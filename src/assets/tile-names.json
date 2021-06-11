@@ -3,8 +3,9 @@
 	"dirt-c",  "dirt-vb", "dirt-vt", "rock-c",  "rock-vb", "rock-vt", "dark-l",  "dark",    "dark-r",  "dark-v",
 	"dirt-tl", "dirt-t",  "dirt-tr", "rock-tl", "rock-t",  "rock-tr", "dark-bl", "dark-b",  "dark-br", "dark-vb",
 	"dirt-bl", "dirt",    "dirt-br", "rock-bl", "rock",    "rock-br", "dark-hl", "dark-h",  "dark-hr", "dark-c",
-	"vine-tl", "vine-t",  "vine-tr", "vine-vt", null,      null,      "back-tl", "back-t",  "back-tr", "back-vt",
-	"vine-l",  "vine-c",  "vine-r",  "vine-vb", null,      null,      "back-l",  "back",    "back-r",  "back-v",
-	"vine-bl", "vine-b",  "vine-br", null,      "root-0",  "root-1",  "back-bl", "back-b",  "back-br", "back-vb",
-	"vine-hl", "vine-hr", null,      "root-2",  "root-3",  "root-4",  "back-hl", "back-h",  "back-hr", "back-c"
+	"vine-tl", "vine-t",  "vine-tr", "vine-vt", "grass-c", "grass-c", "back-tl", "back-t",  "back-tr", "back-vt",
+	"vine-l",  "vine",    "vine-r",  "vine-v",  "grass",   "grass",   "back-l",  "back",    "back-r",  "back-v",
+	"vine-bl", "vine-b",  "vine-br", "vine-vb", "grass",   "grass",   "back-bl", "back-b",  "back-br", "back-vb",
+	"vine-hl", "vine-h",  "vine-hr", "vine-c",  "grass-l", "grass-r", "back-hl", "back-h",  "back-hr", "back-c",
+	"root-0",  "root-1",  "root-2",  "root-3",  "root-4",  "root-5",  "root-6",  "root-7",  "root-8",  "root-9"
 ]

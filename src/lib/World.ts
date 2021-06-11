@@ -10,6 +10,8 @@ import GenerateBack from './generation/Background';
 import GenerateFoliage from './generation/Foliage';
 import GenerateLand from './generation/Land';
 
+import { windFilter } from './shading/WindFilter';
+
 import type { Tile, TileType, World } from './types/World';
 
 export type { Tile, TileType };
@@ -67,6 +69,12 @@ export const BlitWorld = (world: World, stage: Container): void =>
 			// Position and scale the tile
 			sprite.scale.set(tileScale, tileScale);
 			sprite.position.set(col * tileScale * tileSize.width, row * tileScale * tileSize.height);
+
+			// Add filters
+			if (tile.type === 'root' || tile.type === 'grass')
+			{
+				sprite.filters = [windFilter];
+			}
 
 			container.addChild(sprite);
 		});

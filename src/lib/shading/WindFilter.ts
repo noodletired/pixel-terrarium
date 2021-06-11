@@ -1,16 +1,18 @@
 import { Filter } from 'pixi.js';
+import config from '/@/config';
 
-import { RegisterUpdateCallback, noiseTexture } from '../Filters';
+import { RegisterUpdateCallback } from './Filters';
 
-import vertex from '/@/assets/shaders/wind.vert?raw';
+import vertex from '/@/assets/shaders/wind.vert';
 
+// Set the uniforms for wind shader
 export const windUniforms = {
-	time: Date.now(),
-	velocity: [-1, -0.1],
-	noise: noiseTexture
+	time: 0,
+	velocity: config.windStrength || [0.14, 0.02]
 };
 
-export const windFilter = new Filter(vertex, undefined, windUniforms);
-
 // Register an update callback
-RegisterUpdateCallback('wind', () => windUniforms.time = Date.now());
+RegisterUpdateCallback('wind', (deltaTime): void => windUniforms.time += deltaTime);
+
+// Export the filter
+export const windFilter = new Filter(vertex, undefined, windUniforms);

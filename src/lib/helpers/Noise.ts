@@ -1,7 +1,13 @@
+import { Loader, utils } from 'pixi.js';
 import { makeNoise2D } from 'open-simplex-noise';
 
 import { Bitmap, Clamp, IsArray } from '../types/Array2D';
 export { Bitmap, Clamp };
+
+import noiseURL from '/@/assets/noise.png';
+
+import type { Texture } from 'pixi.js';
+
 
 /**
  * Generate2D
@@ -22,7 +28,7 @@ export const Generate2D = (
 	normalize = true
 ): Bitmap =>
 {
-	const seed = 1;//Date.now();
+	const seed = Date.now();
 	const xF = IsArray(frequency) ? frequency[0] : frequency;
 	const yF = IsArray(frequency) ? frequency[1] : frequency;
 	const Simplex = makeNoise2D(seed);
@@ -31,3 +37,10 @@ export const Generate2D = (
 		Simplex(col * xF, row * yF)) * scale * (normalize ? Math.SQRT2 : 1)
 	);
 };
+
+
+// Load and exportnoise texture
+export const noiseTexture = await new Promise<Texture>(resolve =>
+{
+	Loader.shared.add(noiseURL, () => resolve(utils.TextureCache[noiseURL]));
+});

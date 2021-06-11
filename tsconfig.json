@@ -11,7 +11,8 @@
 		"moduleResolution": "node",
 		"noEmit": true,
 		"paths": {
-			"/@/*": ["./src/*"]
+			"/@/*": ["./src/*"],
+			"mini-signals": ["node_modules/resource-loader/typings/mini-signals.d.ts"]
 		},
 		"resolveJsonModule": true,
 		"skipLibCheck": true,

@@ -10,7 +10,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import config from './config';
 
 import { BlitWorld, GenerateWorld } from './lib/World';
-import { CreatePixiApp, Render } from './lib/PixiApp';
+import { CreatePixiApp, ticker } from './lib/PixiApp';
 
 export default defineComponent({
 	name: 'application',
@@ -23,12 +23,13 @@ export default defineComponent({
 		onMounted(() =>
 		{
 			let app = CreatePixiApp({
+				antialias: config.antialias ?? true,
 				backgroundAlpha: config.transparent ? 0 : 1,
 				view: canvas.value!
 			});
 
 			BlitWorld(world, app.stage);
-			Render();
+			ticker.start();
 		});
 
 		// TODO: generate tilemap

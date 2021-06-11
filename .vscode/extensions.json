@@ -6,6 +6,7 @@
 		"gencer.html-slim-scss-css-class-completion",
 		"dbaeumer.vscode-eslint",
 		"stylelint.vscode-stylelint",
-		"slevesque.shader"
+		"slevesque.shader",
+		"boyswan.glsl-literal"
 	]
 }

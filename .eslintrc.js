@@ -156,5 +156,5 @@ module.exports = {
 		'vue/valid-next-tick': e
 	},
 
-	ignorePatterns: ['config.js']
+	ignorePatterns: ['config.js', '*.vert.js', '*.frag.js']
 };
