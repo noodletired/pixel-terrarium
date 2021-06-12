@@ -12,7 +12,10 @@ export const windUniforms = {
 };
 
 // Register an update callback
-RegisterUpdateCallback('wind', (deltaTime): void => windUniforms.time += deltaTime);
+RegisterUpdateCallback('wind', (deltaTime): void =>
+{
+	windUniforms.time += deltaTime;
+});
 
 // Export the filter
 export const windFilter = new Filter(vertex, undefined, windUniforms);

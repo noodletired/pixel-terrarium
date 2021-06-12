@@ -12,7 +12,10 @@ import type { WorldLayer } from '../types/World';
 const width = config.worldWidth;
 const height = config.worldHeight;
 const reductionKernel = plus3x3;
-const cleanupKernels = [new Mask(3, 3, [0, 0, 0, 0, 1, 0, 0, 0, 0]), new Mask(3, 3, [0, 1, 0, 1, 0, 1, 0, 1, 0])];
+const cleanupKernels: [Mask, Mask] = [
+	new Mask(3, 3, [0, 0, 0, 0, 1, 0, 0, 0, 0]),
+	new Mask(3, 3, [0, 1, 0, 1, 0, 1, 0, 1, 0])
+];
 
 export default (): WorldLayer =>
 {

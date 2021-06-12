@@ -103,7 +103,7 @@ export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite |
 			bitmask = <BitmaskTileLookup>bitmask16;
 			break;
 		case maskType.startsWith('indexed') && maskType: {
-			const size = parseInt(/indexed-(?<size>\d+)/.exec(maskType)?.groups.size ?? 0);
+			const size = parseInt(/indexed-(?<size>\d+)/.exec(maskType)?.groups?.size ?? '0');
 			bitmask = <BitmaskTileLookup>{ '0000': [...Array(size).fill(0).map((_, i) => `-${i}`)] };
 		} break;
 		default:
@@ -126,14 +126,14 @@ export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite |
 
 	// Concat the tile type with the option suffix
 	const tileName = type + bitmaskOption;
-	if (!tileset.has(tileName))
+	const tileOptions = tileset.get(tileName);
+	if (!tileOptions)
 	{
 		console.error(`Could not find tile ${tileName} in tileset.`);
 		throw new ReferenceError(`Could not find tile ${tileName} in tileset.`);
 	}
 
 	// Select a tile option
-	const tileOptions: Texture[]! = tileset.get(tileName);
 	const randomIndex = Math.floor(Math.random() * tileOptions.length);
 
 	return new Sprite(tileOptions[randomIndex]);

@@ -1,6 +1,6 @@
 import { Ticker } from 'pixi.js';
 
-export type FilterUpdateCallback = (deltaTime?: number) => void;
+export type FilterUpdateCallback = (deltaTime: number) => void;
 
 /**
  * RegisterUpdateCallback

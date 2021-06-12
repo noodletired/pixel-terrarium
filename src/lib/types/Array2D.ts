@@ -445,11 +445,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value + rhs.fields[i])));
+			return Bitmap.From(this.Map((value, i) => clamping.Apply(value + rhs.fields[i])));
 		}
 		else
 		{
-			return Bitmap.From(this.Map(value => clamping.Clamp(value + rhs)));
+			return Bitmap.From(this.Map(value => clamping.Apply(value + rhs)));
 		}
 	}
 
@@ -463,11 +463,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value - rhs.fields[i])));
+			return Bitmap.From(this.Map((value, i) => clamping.Apply(value - rhs.fields[i])));
 		}
 		else
 		{
-			return Bitmap.From(this.Map(value => clamping.Clamp(value - rhs)));
+			return Bitmap.From(this.Map(value => clamping.Apply(value - rhs)));
 		}
 	}
 
@@ -481,11 +481,11 @@ export class Bitmap extends Array2D<number>
 	{
 		if (rhs instanceof Bitmap)
 		{
-			return Bitmap.From(this.Map((value, i) => clamping.Clamp(value * rhs.fields[i])));
+			return Bitmap.From(this.Map((value, i) => clamping.Apply(value * rhs.fields[i])));
 		}
 		else
 		{
-			return Bitmap.From(this.Map(value => clamping.Clamp(value * rhs)));
+			return Bitmap.From(this.Map(value => clamping.Apply(value * rhs)));
 		}
 	}
 }

@@ -6,7 +6,9 @@ export class Clamp
 {
 	static readonly NONE = new Clamp();
 	static readonly UINT8 = new Clamp(0, 255, true);
+	static readonly UINT8_NOWRAP = new Clamp(0, 255);
 	static readonly INT8 = new Clamp(-128, 127, true);
+	static readonly INT8_NOWRAP = new Clamp(-128, 127);
 	static readonly POSITIVE = new Clamp(0);
 	static readonly POSITIVE_NONZERO = new Clamp(1);
 
@@ -22,12 +24,12 @@ export class Clamp
 	}
 
 	/**
-	* Clamp
+	* Apply
 	* Applies clamping rules to a value.
 	* @param value Value to clamp.
 	* @returns clamped value.
 	*/
-	Clamp(value: number): number
+	Apply(value: number): number
 	{
 		if (!Number.isFinite(value) || Number.isNaN(value))
 		{

@@ -1,7 +1,7 @@
 import { Application, IApplicationOptions, Loader, MIPMAP_MODES, SCALE_MODES, Ticker, settings } from 'pixi.js';
 
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
-settings.MIPMAP_MODES = MIPMAP_MODES.OFF;
+settings.MIPMAP_TEXTURES = MIPMAP_MODES.OFF;
 settings.ROUND_PIXELS = true;
 Loader.shared.load();
 

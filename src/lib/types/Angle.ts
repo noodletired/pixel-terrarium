@@ -9,49 +9,45 @@ export abstract class Angle
 
 	/**
 	 * Normalise
-	 * Normalises degrees to [0, 360), radians to [-pi, pi)
+	 * Normalises degrees to [0, 360), radians to (-pi, pi]
 	 */
-	private Normalise(value: number, degrees: boolean): this
+	private Normalise(value: number, degrees: boolean): number
 	{
 		if (degrees)
 		{
-			this.value %= 360;
-			if (this.value < 0)
+			value %= 360;
+			if (value < 0)
 			{
-				this.value += 360;
+				value += 360;
 			}
 		}
 		else
 		{
-			const { value: x } = this;
 			const { atan2, sin, cos } = Math;
-			this.value = atan2(sin(x), cos(x));
+			value = atan2(sin(value), cos(value));
 		}
+		return value;
 	}
 
 	get degrees(): number
 	{
-		return this.value;
+		return this.Normalise(this.value, true);
 	}
 
-	set degrees(degrees: number): number
+	set degrees(degrees: number)
 	{
 		this.value = degrees;
-		this.Normalise();
-		return this.value;
 	}
 
 	get radians(): number
 	{
-		return this.value / 180.0 * Angle.PI;
+		return this.Normalise(this.value / 180.0 * Angle.PI, false);
 	}
 
-	set radians(radians: number): number
+	set radians(radians: number)
 	{
 		const degrees = radians * 180.0 / Angle.PI;
 		this.value = degrees;
-		this.Normalise();
-		return this.radians;
 	}
 }
 
@@ -64,6 +60,7 @@ export class Degrees extends Angle
 {
 	constructor(value: number)
 	{
+		super();
 		this.degrees = value;
 	}
 }
@@ -77,6 +74,7 @@ export class Radians extends Angle
 {
 	constructor(value: number)
 	{
+		super();
 		this.radians = value;
 	}
 }

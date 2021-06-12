@@ -4,6 +4,7 @@ import { makeNoise2D } from 'open-simplex-noise';
 import { Bitmap, Clamp, IsArray } from '../types/Array2D';
 export { Bitmap, Clamp };
 
+import config from '/@/config';
 import noiseURL from '/@/assets/noise.png';
 
 import type { Texture } from 'pixi.js';
@@ -28,12 +29,12 @@ export const Generate2D = (
 	normalize = true
 ): Bitmap =>
 {
-	const seed = Date.now();
+	const seed = config.debug ? 1 : Date.now();
 	const xF = IsArray(frequency) ? frequency[0] : frequency;
 	const yF = IsArray(frequency) ? frequency[1] : frequency;
 	const Simplex = makeNoise2D(seed);
 
-	return new Bitmap(width, height, (i, row, col) => clamping.Clamp(
+	return new Bitmap(width, height, (i, row, col) => clamping.Apply(
 		Simplex(col * xF, row * yF)) * scale * (normalize ? Math.SQRT2 : 1)
 	);
 };

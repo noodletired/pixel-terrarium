@@ -1,17 +1,46 @@
-import { Angle, Radians } from './Angle';
+import { Angle, Degrees, Radians } from './Angle';
 
-type VectorLike = { x: number, y: number };
-type ScalarOrVectorLike = number | VectorLike;
+export type VectorLike = { x: number, y: number };
+export type ScalarOrVectorLike = number | VectorLike;
+
+export { Angle, Degrees, Radians };
 
 /**
  * Vector
  * A 2D vector number.
  */
-export default class Vector implements VectorLike
+export class Vector implements VectorLike
 {
 	x: number;
 	y: number;
-	constructor(public x: number, public y: number);
+
+	constructor(x: number, y: number);
+	constructor(scalar: number);
+	constructor(vector: VectorLike);
+	constructor(); // zeros vector
+	constructor(...args: [VectorLike | number] | [number, number] | [])
+	{
+		let x: number, y: number;
+		if (args.length === 0)
+		{
+			x = 0; y = 0;
+		}
+		else if (args.length === 2)
+		{
+			[x, y] = args;
+		}
+		else if (typeof args[0] === 'number')
+		{
+			y = x = args[0] as number;
+		}
+		else
+		{
+			({ x, y } = args[0] as VectorLike);
+		}
+
+		this.x = x;
+		this.y = y;
+	}
 
 	get magnitude(): number
 	{
@@ -35,7 +64,7 @@ export default class Vector implements VectorLike
 
 	toPlainObject(): VectorLike
 	{
-		return { x, y } = this;
+		return { x: this.x, y: this.y };
 	}
 
 	/**
@@ -105,9 +134,47 @@ export default class Vector implements VectorLike
 		return this.x === x && this.y === y;
 	}
 
-	Normalize(): this
+	Greater(arg: ScalarOrVectorLike): boolean
 	{
-		return this.Divide(this.magnitude);
+		const { x, y } = this.Vectorise(arg);
+		return this.x > x && this.y > y;
+	}
+
+	GreaterOrEqual(arg: ScalarOrVectorLike): boolean
+	{
+		const { x, y } = this.Vectorise(arg);
+		return this.x >= x && this.y >= y;
+	}
+
+	Less(arg: ScalarOrVectorLike): boolean
+	{
+		const { x, y } = this.Vectorise(arg);
+		return this.x < x && this.y < y;
+	}
+
+	LessOrEqual(arg: ScalarOrVectorLike): boolean
+	{
+		const { x, y } = this.Vectorise(arg);
+		return this.x <= x && this.y <= y;
+	}
+
+	Normalise(): this
+	{
+		const { magnitude } = this;
+		if (magnitude === 0)
+		{
+			this.x = 1;
+			this.y = 0;
+			return this;
+		}
+		return this.Divide(magnitude);
+	}
+
+	Cardinalise(): this
+	{
+		this.x = Math.sign(this.x);
+		this.y = Math.sign(this.y);
+		return this;
 	}
 
 	Dot({ x, y }: VectorLike): number
@@ -152,7 +219,7 @@ export default class Vector implements VectorLike
 
 	Rotate(angle: Angle): this
 	{
-		const radians = { angle };
+		const { radians } = angle;
 		const { x, y } = this;
 		const cos = Math.cos(radians);
 		const sin = Math.sin(radians);
@@ -172,6 +239,32 @@ export default class Vector implements VectorLike
 		this.y = ((0.5 + this.y * precision) << 0) / precision;
 
 		return this;
+	}
+
+	Floor(): this
+	{
+		this.x = Math.floor(this.x);
+		this.y = Math.floor(this.y);
+		return this;
+	}
+
+	Ceil(): this
+	{
+		this.x = Math.ceil(this.x);
+		this.y = Math.ceil(this.y);
+		return this;
+	}
+
+	Trunc(): this
+	{
+		this.x = Math.trunc(this.x);
+		this.y = Math.trunc(this.y);
+		return this;
+	}
+
+	Fract(): this
+	{
+		return this.Subtract(this.Copy().Trunc());
 	}
 
 	Copy(): Vector
