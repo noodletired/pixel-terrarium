@@ -30,6 +30,6 @@ export default (): WorldLayer =>
 	{
 		const type: TileType = bit ? 'back' : 'void';
 		const cardinals = CardinalsFromMask(mask, row, col);
-		return new Tile(type, cardinals);
+		return new Tile({ x: col, y: row }, type, cardinals);
 	});
 };

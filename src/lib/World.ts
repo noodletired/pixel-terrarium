@@ -1,7 +1,7 @@
-import { Container, Sprite, Texture } from 'pixi.js';
+import { Container, Filter, Sprite, Texture, filters } from 'pixi.js';
 import config from '/@/config';
 
-import { CreateTileSprite, tileSize } from './Tileset';
+import { GetTextureFromTileset, scaledTileSize } from './Tileset';
 
 import { Bitmap, Clamp, Mask } from './types/Array2D';
 import { CardinalsFromMask } from './types/Cardinals';
@@ -10,14 +10,12 @@ import GenerateBack from './generation/Background';
 import GenerateFoliage from './generation/Foliage';
 import GenerateLand from './generation/Land';
 
-import CalculateShadows from './shading/Shadows';
-import { windFilter } from './shading/WindFilter';
+import { ComputeGlobalIllumination } from './shading/Shadows';
 
 import type { Tile, TileType, World } from './types/World';
 
 export type { Tile, TileType };
 
-const { tileScale } = config;
 const debugContainer = new Container();
 
 /**
@@ -33,10 +31,12 @@ export const GenerateWorld = (): World =>
 	// Generate layers
 	const back = GenerateBack();
 	const land = GenerateLand();
-	const foliage = GenerateFoliage(land);
+	const foliage = GenerateFoliage(land); // TODO: consolidate into "interactions" layer
+	// TODO: add particle effects layer
 
-	const shadows = CalculateShadows(land);
-	DebugDrawBitmap(shadows, 20, debugContainer);
+	const scale = 0.75;
+	const globalLighting = ComputeGlobalIllumination(land).Multiply(256).Resize(scale);
+	DebugDrawBitmap(debugContainer, globalLighting, 'grey', 1.0 / scale, [new filters.BlurFilter()]);
 
 	layers.push(back, land, foliage);
 
@@ -47,9 +47,10 @@ export const GenerateWorld = (): World =>
 /**
  * BlitWorld
  * Completely updates the stage with new sprites.
- * @param stage Container, destructured from PixiJS Application.
+ * @param stage Container to blit into.
+ * @param world World structure to draw.
  */
-export const BlitWorld = (world: World, stage: Container): void =>
+export const BlitWorld = (stage: Container, world: World): void =>
 {
 	stage.removeChildren();
 
@@ -57,32 +58,7 @@ export const BlitWorld = (world: World, stage: Container): void =>
 	const layers = world.map((layer): Container =>
 	{
 		const container = new Container();
-		layer.ForEach((tile, i, row, col) =>
-		{
-			if (tile.type === 'void')
-			{
-				return; // ignore void tiles
-			}
-
-			const sprite = CreateTileSprite(tile.type, tile.cardinals);
-			if (!sprite)
-			{
-				console.error('We should always have a sprite...'); // we handled voids, so why did we hit this?
-				return;
-			}
-
-			// Position and scale the tile
-			sprite.scale.set(tileScale, tileScale);
-			sprite.position.set(col * tileScale * tileSize.width, row * tileScale * tileSize.height);
-
-			// Add filters
-			if (tile.type === 'root' || tile.type === 'grass')
-			{
-				sprite.filters = [windFilter];
-			}
-
-			container.addChild(sprite);
-		});
+		layer.ForEach(tile => container.addChild(tile.sprite));
 
 		return container;
 	});
@@ -104,7 +80,7 @@ export const BlitWorld = (world: World, stage: Container): void =>
  * @param type TileType to draw with (purely for visual funs).
  * @param container Container to draw into.
  */
-export const DebugDrawMask = (mask: Mask, type: TileType, container: Container): void =>
+export const DebugDrawMask = (container: Container, mask: Mask, type: TileType): void =>
 {
 	container.removeChildren();
 
@@ -117,7 +93,7 @@ export const DebugDrawMask = (mask: Mask, type: TileType, container: Container):
 		}
 
 		const cardinals = CardinalsFromMask(mask, row, col);
-		const sprite = CreateTileSprite(type, cardinals);
+		const sprite = new Sprite(GetTextureFromTileset(type, cardinals));
 		if (!sprite)
 		{
 			console.error('We should always have a sprite...');
@@ -125,8 +101,9 @@ export const DebugDrawMask = (mask: Mask, type: TileType, container: Container):
 		}
 
 		// Position and scale the tile
-		sprite.scale.set(tileScale, tileScale);
-		sprite.position.set(col * tileScale * tileSize.width, row * tileScale * tileSize.height);
+		sprite.width = scaledTileSize.width;
+		sprite.height = scaledTileSize.height;
+		sprite.position.set(col * scaledTileSize.width, row * scaledTileSize.height);
 
 		container.addChild(sprite);
 	});
@@ -136,11 +113,19 @@ export const DebugDrawMask = (mask: Mask, type: TileType, container: Container):
 /**
  * DebugDrawBitmap
  * Draws a grayscale bitmap to a contaienr.
+ * @param container Container to draw into.
  * @param bitmap Bitmap to draw.
- * @param scaling Multiplier to apply (e.g. if bitmap exceeds 255).
- * @param stage Container to draw into.
+ * @param mode Whether to clamp to 255 or to treat as a hexadecimal.
+ * @param scale Useful for visualising downsampled bitmaps, e.g. for lighting.
+ * @param filters Applied to the whole container; useful for visualising full-screen effects, e.g. blur.
  */
-export const DebugDrawBitmap = (bitmap: Bitmap, scaling: number, container: Container): void =>
+export const DebugDrawBitmap = (
+	container: Container,
+	bitmap: Bitmap,
+	mode: 'grey'|'color',
+	scale: 1,
+	filters: Filter[] = []
+): void =>
 {
 	container.removeChildren();
 
@@ -153,15 +138,23 @@ export const DebugDrawBitmap = (bitmap: Bitmap, scaling: number, container: Cont
 		}
 
 		const sprite = new Sprite(Texture.WHITE);
-		sprite.width = tileSize.width * tileScale;
-		sprite.height = tileSize.height * tileScale;
-		sprite.position.set(col * tileScale * tileSize.width, row * tileScale * tileSize.height);
+		sprite.width = scaledTileSize.width * scale;
+		sprite.height = scaledTileSize.height * scale;
+		sprite.position.set(col * scaledTileSize.width * scale, row * scaledTileSize.height * scale);
 
-		const scaledValue = value * scaling;
-		const u8Value = Clamp.UINT8_NOWRAP.Apply(scaledValue) & 0xFF;
-		sprite.tint = 0xFF00FF;
-		sprite.alpha = (u8Value) / 512;
+		if (mode === 'grey')
+		{
+			const u8Value = Clamp.UINT8_NOWRAP.Apply(value);
+			sprite.tint = 0xff00ff;
+			sprite.alpha = (u8Value) / 255 * 0.75;
+		}
+		else
+		{
+			sprite.tint = new Clamp(0, 0xffffff).Apply(value);
+			sprite.alpha = 0.75;
+		}
 
 		container.addChild(sprite);
+		container.filters = filters;
 	});
 };

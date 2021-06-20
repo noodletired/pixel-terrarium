@@ -32,6 +32,6 @@ export default (): WorldLayer =>
 		}
 
 		const cardinals = CardinalsFromMask(cardinalMask, row, col);
-		return new Tile(type, cardinals);
+		return new Tile({ x: col, y: row }, type, cardinals);
 	});
 };

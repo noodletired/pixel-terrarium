@@ -52,4 +52,18 @@ export class Clamp
 			return Math.max(this.min, Math.min(this.max, value));
 		}
 	}
+
+	/**
+	 * Rescale
+	 * Applies clamping, but first rescales values.
+	 * @param min Minimum of the value's expected range.
+	 * @param max Maximum of the value's expected range.
+	 */
+	Rescale(value: number, min: number, max: number): number
+	{
+		// Convert value to 0-1 in its expected range.
+		const normalisedValue = (value - min) / (max - min);
+		const rescaledValue = normalisedValue * (this.max - this.min) + this.min;
+		return this.Apply(rescaledValue);
+	}
 }

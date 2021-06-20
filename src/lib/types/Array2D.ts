@@ -1,4 +1,6 @@
 import { Clamp } from './Clamp';
+import { Vector } from './Vector';
+
 export { Clamp };
 
 // Helper types
@@ -224,12 +226,42 @@ export class Mask extends Array2D<boolean>
 	/**
 	 * From
 	 * Converts an Array2D to a Mask.
-	 * @param base
-	 * @returns
 	 */
 	static From(base: Array2D<boolean>): Mask
 	{
 		return new Mask(base.width, base.height, base.fields);
+	}
+
+	/**
+	 * Resize
+	 * Converts a mask to a different size.
+	 * Nearest neighbour sampling is used.
+	 */
+	Resize(width: number, height: number): Mask;
+	Resize(scale: number): Mask;
+	Resize(...args: [number] | [number, number]): Mask
+	{
+		let width, height;
+		if (args.length === 1)
+		{
+			const [scale] = args;
+			width = Math.floor(this.width * scale);
+			height = Math.floor(this.height * scale);
+		}
+		else
+		{
+			[width, height] = args;
+		}
+
+		const colRatio = width / this.width;
+		const rowRatio = height / this.height;
+
+		return new Mask(width, height, (i, row, col) =>
+		{
+			const sampleRow = Math.floor(row / rowRatio);
+			const sampleCol = Math.floor(col / colRatio);
+			return this.GetAt(sampleRow, sampleCol);
+		});
 	}
 
 	/**
@@ -391,12 +423,60 @@ export class Bitmap extends Array2D<number>
 	/**
 	 * From
 	 * Converts an Array2D to a Mask.
-	 * @param base
-	 * @returns
 	 */
 	static From(base: Array2D<number>): Bitmap
 	{
 		return new Bitmap(base.width, base.height, base.fields);
+	}
+
+	/**
+	 * Resize
+	 * Converts a bitmap to a different size.
+	 * Bilinear sampling is used.
+	 */
+	Resize(width: number, height: number): Bitmap;
+	Resize(scale: number): Bitmap;
+	Resize(...args: [number] | [number, number]): Bitmap
+	{
+		let width, height;
+		if (args.length === 1)
+		{
+			const [scale] = args;
+			width = Math.floor(this.width * scale);
+			height = Math.floor(this.height * scale);
+		}
+		else
+		{
+			[width, height] = args;
+		}
+
+		const colRatio = width / this.width;
+		const rowRatio = height / this.height;
+
+		return new Bitmap(width, height, (i, row, col): number =>
+		{
+			const sample = new Vector(col / colRatio, row / rowRatio);
+			const bias = sample.Copy().Fract();
+			const xBias = new Vector(1.0 - bias.x, bias.x);
+			const yBias = new Vector(1.0 - bias.y, bias.y);
+			const min = sample.Copy().Floor();
+			const max = min.Copy().Add(1).Clamp(new Vector(), new Vector(this.width - 1, this.height - 1));
+
+			const points = [
+				this.GetAt(min.y, min.x), // 0, 0
+				this.GetAt(min.y, max.x), // 1, 0
+				this.GetAt(max.y, min.x), // 0, 1
+				this.GetAt(max.y, max.x)  // 1, 1
+			];
+
+			const value = (
+				(points[0] * xBias.x * yBias.x) +
+				(points[1] * xBias.y * yBias.x) +
+				(points[2] * xBias.x * yBias.y) +
+				(points[3] * xBias.y * yBias.y)
+			);
+			return value;
+		});
 	}
 
 	/**

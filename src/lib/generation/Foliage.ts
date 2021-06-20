@@ -47,6 +47,6 @@ export default (land: WorldLayer): WorldLayer =>
 			cardinals = new Cardinals(0);
 		}
 
-		return new Tile(type, cardinals);
+		return new Tile({ x: col, y: row }, type, cardinals);
 	});
 };

@@ -1,6 +1,5 @@
 import { Loader, Rectangle, Sprite, Texture, utils } from 'pixi.js';
 
-import { Cardinals } from './types/Cardinals';
 import config from '/@/config';
 
 import tileNames from '/@/assets/tile-names.json';
@@ -11,8 +10,16 @@ import bitmask13 from '/@/assets/bitmask-13.json'; // No basic, v uses t/b, h us
 import bitmask16 from '/@/assets/bitmask-16.json'; // Full 4-bit arrangement
 import bitmask4 from '/@/assets/bitmask-4.json'; // for grass
 
-export { Cardinals };
-export type { Sprite, Texture };
+import { PointLight } from './types/Light';
+
+import windFilter from './shading/WindFilter';
+
+import type { Cardinals } from './types/Cardinals';
+import type { Filter } from 'pixi.js';
+
+export type { Cardinals };
+export type { Sprite, Texture, Filter };
+
 
 export type Tileset = Map<string, Texture[]>;
 export type BitmaskTileLookup = Record<string, string | string[]>; // look up one or more tile suffixes based on Cardinals
@@ -29,8 +36,30 @@ export const tileBitmaskType: Record<TileType, BitmaskType> = {
 	grass: '4',
 	void: 'none'
 } as const;
-export const tileSize = { width: config.tileWidth, height: config.tileHeight } as const;
 
+export const tileSize = {
+	width: config.tileWidth,
+	height: config.tileHeight
+} as const;
+
+export const scaledTileSize = {
+	width: tileSize.width * config.tileScale,
+	height: tileSize.height * config.tileScale
+} as const;
+
+export const tileFilters: Record<string, readonly Filter[]> = {
+	root: [windFilter],
+	grass: [windFilter]
+} as const;
+
+export const transparentTiles: Record<string, boolean> = {
+	vine: true,
+	grass: true,
+	root: true,
+	void: true
+} as const;
+
+export const emissiveTiles: Record<string, PointLight> = {} as const;
 
 // Load tileset
 export const tileset = await new Promise<Tileset>(resolve =>
@@ -77,12 +106,12 @@ export const tileset = await new Promise<Tileset>(resolve =>
 
 
 /**
- * CreateTileSprite
+ * GetTextureFromTileset
  * @param type Type of the tile to render.
  * @param cardinals Cardinal truthiness to lookup sprite from bitmask.
- * @returns a/the texture matching the computed bitmask, or null if type doesn't fit any available bitmasks.
+ * @returns a/the texture matching the computed bitmask, or Texture.WHITE if type doesn't fit any available bitmasks.
  */
-export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite | null =>
+export const GetTextureFromTileset = (type: TileType, cardinals: Cardinals): Texture =>
 {
 	const maskType = tileBitmaskType[type];
 
@@ -107,7 +136,7 @@ export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite |
 			bitmask = <BitmaskTileLookup>{ '0000': [...Array(size).fill(0).map((_, i) => `-${i}`)] };
 		} break;
 		default:
-			return null; // none
+			return Texture.WHITE; // none
 	}
 
 	// Select a tile suffix option
@@ -130,11 +159,11 @@ export const CreateTileSprite = (type: TileType, cardinals: Cardinals): Sprite |
 	if (!tileOptions)
 	{
 		console.error(`Could not find tile ${tileName} in tileset.`);
-		throw new ReferenceError(`Could not find tile ${tileName} in tileset.`);
+		return Texture.WHITE;
 	}
 
 	// Select a tile option
 	const randomIndex = Math.floor(Math.random() * tileOptions.length);
 
-	return new Sprite(tileOptions[randomIndex]);
+	return tileOptions[randomIndex];
 };

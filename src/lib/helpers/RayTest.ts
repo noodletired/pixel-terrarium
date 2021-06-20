@@ -1,4 +1,4 @@
-import { Vector } from '../types/Vector';
+import { Angle, Degrees, Vector } from '../types/Vector';
 
 import type { Mask } from '../types/Array2D';
 
@@ -12,6 +12,7 @@ export interface CastResult
 {
 	hitCount: number,
 	firstHitDistance: number,
+	reflectionAngle: Angle,
 	lastHitDistance: number,
 	distanceTravelled: number
 }
@@ -43,15 +44,21 @@ export const CastRay = (
 	const startPosition = new Vector(startCol, startRow);
 	const position = startPosition.Copy();
 
-	const direction = ray.Copy().Normalise();
+	const direction = ray.Copy().Normalise().ReverseY(); // +y in a mask is down
 	const step = direction.Copy().Cardinalise(); // x/y direction of ray
 	const deltaDist = direction.Copy().Inverse().Abs(); // full-cell step
 	const sideDist = deltaDist.Copy().Multiply(0.5); // half-cell step
 
+	const results: CastResult = {
+		hitCount: 0,
+		firstHitDistance: 0,
+		reflectionAngle: new Degrees(0),
+		lastHitDistance: 0,
+		distanceTravelled: 0
+	};
+
 	let length = 0;
-	let hitCount = 0;
-	let firstHitDistance = 0;
-	let lastHitDistance = 0;
+	let side = 0; // 0: x-side, 1: y-side
 	for (let i = 0; (i < maxSteps && length < maxLength); ++i)
 	{
 		// Increment x or y depending on which is currently closest
@@ -59,30 +66,33 @@ export const CastRay = (
 		{
 			sideDist.x += deltaDist.x;
 			position.x += step.x;
+			side = 0;
 		}
 		else
 		{
 			sideDist.y += deltaDist.y;
 			position.y += step.y;
+			side = 1;
 		}
-		length = position.Distance(startPosition);
+		results.distanceTravelled = length = position.Distance(startPosition);
 
 		// Check boundaries
 		if (position.x < 0 || position.y < 0 || position.x >= width || position.y >= height)
 		{
-			continue;
+			break;
 		}
 
 		// Check mask
 		if (mask.GetAt(position.y, position.x))
 		{
-			if (hitCount === 0)
+			if (results.hitCount === 0)
 			{
-				firstHitDistance = length;
+				results.firstHitDistance = length;
+				results.reflectionAngle = (side === 0) ? ray.Copy().ReverseX().angle : ray.Copy().ReverseY().angle;
 			}
 
-			lastHitDistance = length;
-			++hitCount;
+			results.lastHitDistance = length;
+			results.hitCount++;
 
 			if (stopEarly)
 			{
@@ -91,10 +101,5 @@ export const CastRay = (
 		}
 	}
 
-	return {
-		hitCount,
-		firstHitDistance,
-		lastHitDistance,
-		distanceTravelled: length
-	};
+	return results;
 };

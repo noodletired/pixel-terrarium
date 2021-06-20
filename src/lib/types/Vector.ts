@@ -68,15 +68,6 @@ export class Vector implements VectorLike
 	}
 
 	/**
-	 * FromScalar
-	 * Static method to produce a vector from a scalar; sets (x, y) = s.
-	 */
-	static FromScalar(s: number): Vector
-	{
-		return new Vector(s, s);
-	}
-
-	/**
 	 * Vectorise
 	 * Helper to turn any argument into a vector.
 	 */
@@ -88,7 +79,7 @@ export class Vector implements VectorLike
 		}
 		else if (typeof arg === 'number')
 		{
-			return Vector.FromScalar(arg);
+			return new Vector(arg);
 		}
 		else
 		{
@@ -192,6 +183,18 @@ export class Vector implements VectorLike
 		return this.Multiply(-1);
 	}
 
+	ReverseX(): this
+	{
+		this.x *= -1;
+		return this;
+	}
+
+	ReverseY(): this
+	{
+		this.y *= -1;
+		return this;
+	}
+
 	Inverse(): this
 	{
 		this.x = 1 / this.x;
@@ -270,5 +273,27 @@ export class Vector implements VectorLike
 	Copy(): Vector
 	{
 		return new Vector(this.x, this.y);
+	}
+
+	Clamp(min: VectorLike, max: VectorLike): this
+	{
+		if (this.x < min.x)
+		{
+			this.x = min.x;
+		}
+		else if (this.x > max.x)
+		{
+			this.x = max.x;
+		}
+		if (this.y < min.y)
+		{
+			this.y = min.y;
+		}
+		else if (this.y > max.y)
+		{
+			this.y = max.y;
+		}
+
+		return this;
 	}
 }

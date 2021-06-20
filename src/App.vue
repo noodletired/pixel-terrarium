@@ -28,7 +28,7 @@ export default defineComponent({
 				view: canvas.value!
 			});
 
-			BlitWorld(world, app.stage);
+			BlitWorld(app.stage, world);
 			ticker.start();
 		});
 

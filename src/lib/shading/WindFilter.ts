@@ -1,21 +1,25 @@
-import { Filter } from 'pixi.js';
+import { Filter } from '../types/Filter';
+
 import config from '/@/config';
-
-import { RegisterUpdateCallback } from './Filters';
-
 import vertex from '/@/assets/shaders/wind.vert';
 
-// Set the uniforms for wind shader
-export const windUniforms = {
-	time: 0,
-	velocity: config.windStrength || [0.14, 0.02]
-};
-
-// Register an update callback
-RegisterUpdateCallback('wind', (deltaTime): void =>
+// Define the class
+class WindFilter extends Filter
 {
-	windUniforms.time += deltaTime;
-});
+	constructor(private uniforms = {
+		time: 0,
+		velocity: config.windStrength || [0.14, 0.02]
+	})
+	{
+		super('wind', vertex, undefined, uniforms);
+	}
 
-// Export the filter
-export const windFilter = new Filter(vertex, undefined, windUniforms);
+	Update(deltaTime: number)
+	{
+		this.uniforms.time += deltaTime;
+	}
+}
+
+// Create the filter instance and export the pixijs filter
+const windFilterInstance = new WindFilter();
+export default windFilterInstance.filter;
