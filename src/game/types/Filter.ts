@@ -1,12 +1,8 @@
-import { Filter as PixiFilter, Ticker } from 'pixi.js';
-
-// Add all callbacks to the ticker
-const ticker = Ticker.shared;
-ticker.add((): void => Filter.registeredFilters.forEach(filter => filter.Update(ticker.deltaTime)));
+import { Filter as PixiFilter } from 'pixi.js';
 
 /**
- * Filter
- * Base class for Filters. Automatically updates with the pixi ticker if an Update method is implemented.
+ * Base class for custom Filters, i.e. WebGL shaders
+ * Any imported filters are automatically registered.
  */
 export abstract class Filter
 {
@@ -28,8 +24,7 @@ export abstract class Filter
 	}
 
 	/**
-	 * Update
-	 * Abstract function, could be used to update uniforms.
+	 * Abstract function, intended to be used to update uniforms.
 	 * @param deltaTime Time passed since last update.
 	 */
 	abstract Update(deltaTime: number): void;

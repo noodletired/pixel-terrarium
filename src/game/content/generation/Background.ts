@@ -1,13 +1,13 @@
 import config from '/@/config';
 
-import { Mask, plus3x3 } from '../helpers/MorphologyKernels';
-import { EllipseTest } from '../helpers/MaskShapeTests';
-import { Generate2D } from '../helpers/Noise';
+import { Mask, plus3x3 } from '/@/game/utilities/MorphologyKernels';
+import { EllipseTest } from '/@/game/utilities/MaskShapeTests';
+import { Generate2D } from '/@/game/utilities/Noise';
 
-import { Tile, TileType } from '../types/Tile';
-import { CardinalsFromMask } from '../types/Cardinals';
+import { Tile, TileType } from '/@/game/types/Tile';
+import { CardinalsFromMask } from '/@/game/types/Cardinals';
 
-import type { WorldLayer } from '../types/World';
+import type { WorldLayer } from '/@/game/types/World';
 
 const width = config.worldWidth;
 const height = config.worldHeight;

@@ -1,15 +1,14 @@
 import type { Array2DTest } from '../types/Array2D';
 
 /**
- * EllipseTest
- * For a given width and height, tests for an ellipse.
+ * For a given width and height, creates a test for an ellipse.
  * @param width Width of the Array2D.
  * @param height Height of the Array2D.
  * @param offsetX Offset the centre x.
  * @param offsetY Offset the centre y.
  * @param scaleX Scale the width.
  * @param scaleY Scale the height.
- * @returns Test function, for use with `Array2D.Map`.
+ * @returns a test function, for use with `Array2D.Map`.
  */
 export const EllipseTest = (
 	width: number,

@@ -1,7 +1,6 @@
 import type { Mask } from './Array2D';
 
 /**
- * Cardinals
  * Helper class to convert cardinal truthiness to binary string or number.
  * Follows "NESW" convention with N-MSB, W-LSB.
  */
@@ -46,7 +45,6 @@ export class Cardinals
 }
 
 /**
- * CardinalsFromMask
  * Determines cardinal adjacencies for a single tile/field in a Mask.
  * @param mask The Mask to test from.
  * @param row Row of the tile to check.

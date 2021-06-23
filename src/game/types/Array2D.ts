@@ -17,8 +17,7 @@ export const IsPrimitive = (arg: unknown): boolean =>
 };
 
 /**
- * Array2D
- * A 2D collection.
+ * A generic 2D collection.
  */
 export class Array2D<T>
 {
@@ -26,6 +25,12 @@ export class Array2D<T>
 	readonly height: number;
 	readonly fields: T[];
 
+	/**
+	 * Construct a 2D collection.
+	 * @param width Number of columns in the collection.
+	 * @param height Number of rows in the collection.
+	 * @param initialiser Can be a single value, flat array of entries, or function returning values.
+	 */
 	constructor(width: number, height: number, initialiser: T | T[] | Array2DGenerator<T>)
 	{
 		this.width = width;
@@ -58,8 +63,8 @@ export class Array2D<T>
 	}
 
 	/**
-	 * RowColToIndex
 	 * Helper to translate a row/column position to a field index.
+	 * @returns the 1D index.
 	 */
 	RowColToIndex(row: number, col: number): number
 	{
@@ -71,8 +76,8 @@ export class Array2D<T>
 	}
 
 	/**
-	 * IndexToRowCol
 	 * Helper to translate a field index to a row/column position.
+	 * @returns 2D row and column indices.
 	 */
 	IndexToRowCol(i: number): { row: number, column: number }
 	{
@@ -83,9 +88,9 @@ export class Array2D<T>
 	}
 
 	/**
-	 * GetAt
 	 * Helper to return field value.
-	 * Accepts index or row/col format.
+	 * Accepts 1D index or 2D row/col.
+	 * @returns the value at the given position.
 	 */
 	GetAt(index: number): T;
 	GetAt(row: number, col: number): T;
@@ -104,12 +109,11 @@ export class Array2D<T>
 	}
 
 	/**
-	 * Map
-	 * Applies a function across every field.
-	 * @param Functor Function to apply.
-	 * @returns new Array2D with the result.
+	 * Applies a function across every field, possibly mapping to another type.
+	 * @param Func Function to apply across every field.
+	 * @returns new Array2D with the mapped result.
 	 */
-	Map<U>(Functor: (field: T, i: number, row: number, col: number) => U): Array2D<U>
+	Map<U>(Func: (field: T, i: number, row: number, col: number) => U): Array2D<U>
 	{
 		const fields = new Array<U>(this.width * this.height);
 		let i = 0;
@@ -117,7 +121,7 @@ export class Array2D<T>
 		{
 			for (let col = 0; col < this.width; ++col)
 			{
-				fields[i] = Functor(this.fields[i], i, row, col);
+				fields[i] = Func(this.fields[i], i, row, col);
 				++i;
 			}
 		}
@@ -126,26 +130,25 @@ export class Array2D<T>
 	}
 
 	/**
-	 * ForEach
-	 * Runs a function for every field.
-	 * @param Functor Function to apply.
+	 * Runs a function on every field.
+	 * @param Func Function to apply.
 	 */
-	ForEach(Functor: (field: T, i: number, row: number, col: number) => void): void
+	ForEach(Func: (field: T, i: number, row: number, col: number) => void): void
 	{
 		let i = 0;
 		for (let row = 0; row < this.height; ++row)
 		{
 			for (let col = 0; col < this.width; ++col)
 			{
-				Functor(this.fields[i], i, row, col);
+				Func(this.fields[i], i, row, col);
 				++i;
 			}
 		}
 	}
 
 	/**
-	 * HasSameSize
 	 * Checks if another map matches my size.
+	 * @returns true if both width and height match.
 	 */
 	HasSameSize({ width, height }: Array2D<unknown>): boolean
 	{
@@ -153,11 +156,10 @@ export class Array2D<T>
 	}
 
 	/**
-	 * Reflect
-	 * Flips about its origin. Useful for kernels.
+	 * Cretes a new Array2D flipped about its origin. Useful for kernels.
 	 * @param x Mirror about x axis, i.e. --
 	 * @param y Mirror about y axis, i.e. |
-	 * @returns new Mask with the result.
+	 * @returns a new Array2D (or derived class) with the result.
 	 */
 	Reflect(x = true, y = true): this
 	{
@@ -195,11 +197,14 @@ export class Array2D<T>
 
 
 /**
- * Mask
  * A 2D boolean image/mask.
  */
 export class Mask extends Array2D<boolean>
 {
+	/**
+	 * Construct a mask.
+	 * @see Array2D for constructor parameter details.
+	 */
 	constructor(
 		width: number,
 		height: number,
@@ -224,8 +229,7 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * From
-	 * Converts an Array2D to a Mask.
+	 * Creates a new Mask from an acceptably typed Array2D.
 	 */
 	static From(base: Array2D<boolean>): Mask
 	{
@@ -233,9 +237,10 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Resize
 	 * Converts a mask to a different size.
+	 * Accepts a relative scale, or absolute width/height.
 	 * Nearest neighbour sampling is used.
+	 * @returns new Mask with the result.
 	 */
 	Resize(width: number, height: number): Mask;
 	Resize(scale: number): Mask;
@@ -265,7 +270,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Intersect
 	 * Produces the binary AND between Masks.
 	 * @param rhs Other Mask to compare to.
 	 * @returns new Mask with the result.
@@ -276,7 +280,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Union
 	 * Produces the binary OR of two Masks.
 	 * @param rhs Other Mask to compare to.
 	 * @returns new Mask with the result.
@@ -287,7 +290,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Complement
 	 * Inverts every bit.
 	 * @returns new Mask with the result.
 	 */
@@ -297,9 +299,9 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Erode
 	 * Produces the morphological erosion result using another Mask as a kernel.
 	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
+	 * @param includeEdges Whether an edge is considered 'true' or 'false', default is true.
 	 * @returns new Mask with the result.
 	 */
 	Erode(kernel: Mask, includeEdges = true): Mask
@@ -346,7 +348,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Dilate
 	 * Produces the morphological dilation result using another Mask as a kernel.
 	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
 	 * @returns new Mask with the result.
@@ -357,7 +358,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Open
 	 * Produces the morphological opening result using another Mask as a kernel.
 	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
 	 * @returns new Mask with the result.
@@ -368,7 +368,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * Close
 	 * Produces the morphological closing result using another Mask as a kernel.
 	 * @param kernel Typically a small Mask (3x3) to apply over this Mask.
 	 * @returns new Mask with the result.
@@ -379,7 +378,6 @@ export class Mask extends Array2D<boolean>
 	}
 
 	/**
-	 * HitOrMiss
 	 * Applies the morphological hit-or-miss transform with two disjoint kernels.
 	 * @param hitKernel Mask to include.
 	 * @param missKernel Mask to exclude.
@@ -392,11 +390,14 @@ export class Mask extends Array2D<boolean>
 
 
 /**
- * Bitmap
  * A 2D numeric image.
  */
 export class Bitmap extends Array2D<number>
 {
+	/**
+	 * Construct a bitmap.
+	 * @see Array2D for constructor parameter details.
+	 */
 	constructor(
 		width: number,
 		height: number,
@@ -421,8 +422,7 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * From
-	 * Converts an Array2D to a Mask.
+	 * Creates a new Bitmap from an acceptably typed Array2D.
 	 */
 	static From(base: Array2D<number>): Bitmap
 	{
@@ -430,9 +430,10 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * Resize
 	 * Converts a bitmap to a different size.
+	 * Accepts a relative scale, or absolute width/height.
 	 * Bilinear sampling is used.
+	 * @returns new Bitmap with the result.
 	 */
 	Resize(width: number, height: number): Bitmap;
 	Resize(scale: number): Bitmap;
@@ -480,10 +481,9 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * LessThan
 	 * Produces the result of a logical less-than operation.
 	 * @param rhs Another Bitmap, or a single value to compare to.
-	 * @returns a boolean Mask with the result.
+	 * @returns Mask with the result.
 	 */
 	LessThan(rhs: Bitmap | number): Mask
 	{
@@ -498,10 +498,9 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * GreaterThan
 	 * Produces the result of a logical greater-than operation.
 	 * @param rhs Another Bitmap, or a single value to compare to.
-	 * @returns a boolean Mask with the result.
+	 * @returns Mask with the result.
 	 */
 	GreaterThan(rhs: Bitmap | number): Mask
 	{
@@ -516,9 +515,9 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * Add
 	 * Produces the numerical addition of this and another Bitmap or value.
 	 * @param rhs Another Bitmap, or a single value to add.
+	 * @param clamping Optional clamp to apply post-op.
 	 * @returns new Bitmap with the result.
 	 */
 	Add(rhs: Bitmap | number, clamping: Clamp = Clamp.NONE): Bitmap
@@ -534,9 +533,9 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * Subtract
 	 * Produces the numerical subtration of this and another Bitmap or value.
 	 * @param rhs Another Bitmap, or a single value to subtract.
+	 * @param clamping Optional clamp to apply post-op.
 	 * @returns new Bitmap with the result.
 	 */
 	Subtract(rhs: Bitmap | number, clamping: Clamp = Clamp.NONE): Bitmap
@@ -552,9 +551,9 @@ export class Bitmap extends Array2D<number>
 	}
 
 	/**
-	 * Multiply
 	 * Produces the element-wise multiplication of this and another Bitmap or value.
 	 * @param rhs Another Bitmap, or a single value to multiply with.
+	 * @param clamping Optional clamp to apply post-op.
 	 * @returns new Bitmap with the result.
 	 */
 	Multiply(rhs: Bitmap | number, clamping: Clamp = Clamp.NONE): Bitmap

@@ -1,12 +1,12 @@
 import config from '/@/config';
 
-import { Mask, square3x3 } from '../helpers/MorphologyKernels';
-import { Generate2D } from '../helpers/Noise';
+import { Mask, square3x3 } from '/@/game/utilities/MorphologyKernels';
+import { Generate2D } from '/@/game/utilities/Noise';
 
-import { Cardinals, CardinalsFromMask } from '../types/Cardinals';
-import { Tile, TileType } from '../types/Tile';
+import { Cardinals, CardinalsFromMask } from '/@/game/types/Cardinals';
+import { Tile, TileType } from '/@/game/types/Tile';
 
-import type { WorldLayer } from '../types/World';
+import type { WorldLayer } from '/@/game/types/World';
 
 const width = config.worldWidth;
 const height = config.worldHeight;

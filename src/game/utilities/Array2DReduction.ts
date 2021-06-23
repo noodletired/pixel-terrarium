@@ -1,12 +1,12 @@
 import { Array2D } from '../types/Array2D';
 
 /**
- * RectAroundPoint
- * Extracts a subregion of specified size about a point.
+ * Extract a subregion of specified size about a point.
  * @param row Centre row.
  * @param col Centre column.
  * @param width Width of subregion.
  * @param height Height of subregion.
+ * @returns a subsection of an Array2D of the specified width and height.
  */
 export const RectAroundPoint = <T>(
 	array2D: Array2D<T>,

@@ -1,17 +1,16 @@
 import config from '/@/config';
 
-import { Bitmap, Mask } from '../types/Array2D';
-import { Degrees } from '../types/Angle';
-import { PointLight } from '../types/Light';
+import { Bitmap, Mask } from '/@/game/types/Array2D';
+import { Degrees } from '/@/game/types/Angle';
+//import { PointLight } from '/@/game/types/Light';
 
-import { CastRay, Vector } from '../helpers/RayTest';
-import { plus3x3 } from '../helpers/MorphologyKernels';
+import { CastRay, Vector } from '/@/game/utilities/RayTest';
+import { plus3x3 } from '/@/game/utilities/MorphologyKernels';
 
-import type { WorldLayer } from '../types/World';
+import type { WorldLayer } from '/@/game/types/World';
 
 
 /**
- * ComputeGlobalIllumination
  * Computes global light level/occlusion assuming the world is lit top-down by a very large sun.
  * Rays are checked outward of every point.
  * @param layer Tile layer used to filter and block light.
@@ -34,14 +33,14 @@ export const ComputeGlobalIllumination = (layer: WorldLayer): Bitmap =>
 };
 
 /**
- * ComputeGlobalLightAtPoint
  * Traces outward from a point to determine how much global light reaches it.
  * Fast for dense maps - any hit immediately ends the raytrace.
  * @param wallMask Mask indicating wall locations.
  * @param row Row of the point to emit from.
  * @param col Column of the point to emit from.
  * @param quality Number of rays to emit outward, minimum is 3.
- * @param reflextions Number of reflections to allow.
+ * @param reflections Number of reflections to allow.
+ * @param falloff Number of tiles to attenuate light intensity over.
  * @returns a value from 0-1 representing light intensity.
  */
 export const ComputeGlobalLightAtPoint = (
@@ -82,7 +81,6 @@ export const ComputeGlobalLightAtPoint = (
 
 
 /**
- * ComputePointIllumination
  * Computes a local lightmap from given point lights.
  * @param wallMask Mask indicating occluders.
  * @returns a colour bitmap.

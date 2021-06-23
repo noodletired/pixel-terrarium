@@ -1,16 +1,21 @@
 import { Sprite, Texture } from 'pixi.js';
 
-import { GetTextureFromTileset, emissiveTiles, scaledTileSize, tileFilters, transparentTiles } from '../Tileset';
+import {
+	GetTextureFromTileset,
+	emissiveTiles,
+	scaledTileSize,
+	tileFilters,
+	transparentTiles
+} from '../content/Tileset';
 
-import type { Cardinals, TileType } from '../Tileset';
+import type { Cardinals, TileType } from '../content/Tileset';
 import type { PointLight } from './Light';
 import type { VectorLike } from './Vector';
 
 export type { Cardinals, TileType };
 
 /**
- * Tile
- * Represents everything a tile needs to be rendered.
+ * Representation of a game tile.
  */
 export class Tile
 {
@@ -47,7 +52,6 @@ export class Tile
 	}
 
 	/**
-	 * RecalculateCardinals
 	 * Updates the cardinal definition based on neighbours.
 	 */
 	UpdateCardinals(cardinals: Cardinals): void
@@ -60,7 +64,6 @@ export class Tile
 	}
 
 	/**
-	 * Update
 	 * Updates the sprite texture and position if needed.
 	 */
 	Update(): void

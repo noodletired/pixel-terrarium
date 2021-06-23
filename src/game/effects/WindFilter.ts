@@ -1,9 +1,11 @@
-import { Filter } from '../types/Filter';
+import { Filter } from '/@/game/types/Filter';
 
 import config from '/@/config';
 import vertex from '/@/assets/shaders/wind.vert';
 
-// Define the class
+/**
+ * Singleton class for wind filter.
+ */
 class WindFilter extends Filter
 {
 	constructor(private uniforms = {

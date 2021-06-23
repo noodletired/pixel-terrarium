@@ -1,4 +1,4 @@
-import { Loader, utils } from 'pixi.js';
+import { loader } from '../engine/Loader';
 import { makeNoise2D } from 'open-simplex-noise';
 
 import { Bitmap, Clamp, IsArray } from '../types/Array2D';
@@ -40,8 +40,14 @@ export const Generate2D = (
 };
 
 
-// Load and exportnoise texture
-export const noiseTexture = await new Promise<Texture>(resolve =>
+// Queue the noise texture for loading
+const noiseTexture = loader.Enqueue('noise', noiseURL);
+
+/**
+ * Retrieve the noise texture.
+ * @returns a Promise for the noise texture.
+ */
+export const GetNoiseTexture = (): Promise<Texture> =>
 {
-	Loader.shared.add(noiseURL, () => resolve(utils.TextureCache[noiseURL]));
-});
+	return noiseTexture;
+};

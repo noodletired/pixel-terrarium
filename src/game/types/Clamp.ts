@@ -1,6 +1,5 @@
 /**
- * Clamp
- * Set of rules to Map during clamping.
+ * Set of min/max rules to apply to numeric values.
  */
 export class Clamp
 {
@@ -24,11 +23,10 @@ export class Clamp
 	}
 
 	/**
-	* Apply
-	* Applies clamping rules to a value.
-	* @param value Value to clamp.
-	* @returns clamped value.
-	*/
+	 * Applies clamping rules to a value.
+	 * @param value Value to clamp.
+	 * @returns clamped value.
+	 */
 	Apply(value: number): number
 	{
 		if (!Number.isFinite(value) || Number.isNaN(value))
@@ -54,10 +52,10 @@ export class Clamp
 	}
 
 	/**
-	 * Rescale
 	 * Applies clamping, but first rescales values.
 	 * @param min Minimum of the value's expected range.
 	 * @param max Maximum of the value's expected range.
+	 * @retuns rescaled, clamped value.
 	 */
 	Rescale(value: number, min: number, max: number): number
 	{

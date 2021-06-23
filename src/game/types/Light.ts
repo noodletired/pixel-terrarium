@@ -5,7 +5,6 @@ import type { VectorLike } from './Vector';
 export type { VectorLike };
 
 /**
- * PointLight
  * Representation of a point lamp.
  */
 export class PointLight

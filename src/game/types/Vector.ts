@@ -6,8 +6,7 @@ export type ScalarOrVectorLike = number | VectorLike;
 export { Angle, Degrees, Radians };
 
 /**
- * Vector
- * A 2D vector number.
+ * A 2D numeric vector.
  */
 export class Vector implements VectorLike
 {

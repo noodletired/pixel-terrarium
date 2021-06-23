@@ -1,5 +1,4 @@
 /**
- * Angle
  * Utility class to easily manage angles in radians and degrees.
  */
 export abstract class Angle
@@ -8,7 +7,6 @@ export abstract class Angle
 	protected value = 0; // store in degrees
 
 	/**
-	 * Normalise
 	 * Normalises degrees to [0, 360), radians to (-pi, pi]
 	 */
 	private Normalise(value: number, degrees: boolean): number
@@ -29,6 +27,9 @@ export abstract class Angle
 		return value;
 	}
 
+	/**
+	 * Gets angle in degrees from 0 to 360.
+	 */
 	get degrees(): number
 	{
 		return this.Normalise(this.value, true);
@@ -39,6 +40,9 @@ export abstract class Angle
 		this.value = degrees;
 	}
 
+	/**
+	 * Gets angle in radians from -pi to pi.
+	 */
 	get radians(): number
 	{
 		return this.Normalise(this.value / 180.0 * Angle.PI, false);
@@ -53,7 +57,6 @@ export abstract class Angle
 
 
 /**
- * Degrees
  * Semantic helper class to construct Angle with degrees.
  */
 export class Degrees extends Angle
@@ -67,7 +70,6 @@ export class Degrees extends Angle
 
 
 /**
- * Radians
  * Semantic helper class to construct Angle with radians.
  */
 export class Radians extends Angle

@@ -1,4 +1,5 @@
-import { Loader, Rectangle, Sprite, Texture, utils } from 'pixi.js';
+import { Rectangle, Sprite, Texture, utils } from 'pixi.js';
+import { loader } from '../engine/Loader';
 
 import config from '/@/config';
 
@@ -10,11 +11,11 @@ import bitmask13 from '/@/assets/bitmask-13.json'; // No basic, v uses t/b, h us
 import bitmask16 from '/@/assets/bitmask-16.json'; // Full 4-bit arrangement
 import bitmask4 from '/@/assets/bitmask-4.json'; // for grass
 
-import { PointLight } from './types/Light';
+import { PointLight } from '../types/Light';
 
-import windFilter from './shading/WindFilter';
+import windFilter from '../effects/WindFilter';
 
-import type { Cardinals } from './types/Cardinals';
+import type { Cardinals } from '../types/Cardinals';
 import type { Filter } from 'pixi.js';
 
 export type { Cardinals };
@@ -61,52 +62,58 @@ export const transparentTiles: Record<string, boolean> = {
 
 export const emissiveTiles: Record<string, PointLight> = {} as const;
 
-// Load tileset
-export const tileset = await new Promise<Tileset>(resolve =>
+// Actual tileset
+export const tileset: Tileset = new Map();
+
+/**
+ * Load the game tileset.
+ * Should only be called once.
+ * @returns the tileset export.
+ */
+export const LoadTileset = (async (): Promise<Tileset> =>
 {
 	try
 	{
-		Loader.shared.add(tilesetURL, () =>
+		// Load tileset image
+		await loader.Enqueue('tileset', tilesetURL);
+		tileset.clear();
+
+		const atlas = utils.TextureCache[tilesetURL];
+		const cols = Math.floor(atlas.width / tileSize.width);
+		const rows = Math.floor(atlas.height / tileSize.height);
+
+		// Populate map from tileNames
+		for (let y = 0; y < rows; ++y)
 		{
-			const atlas = utils.TextureCache[tilesetURL];
-			const cols = Math.floor(atlas.width / tileSize.width);
-			const rows = Math.floor(atlas.height / tileSize.height);
-
-			// Populate map from tileNames
-			const tileset: Tileset = new Map();
-			for (let y = 0; y < rows; ++y)
+			for (let x = 0; x < cols; ++x)
 			{
-				for (let x = 0; x < cols; ++x)
+				const index = y * cols + x;
+				const tileName = tileNames[index];
+				if (!tileName)
 				{
-					const index = y * cols + x;
-					const tileName = tileNames[index];
-					if (!tileName)
-					{
-						continue; // skip blank tiles
-					}
-
-					const frame = new Rectangle(x * tileSize.width, y * tileSize.height, tileSize.width, tileSize.height);
-					const texture = new Texture(atlas.baseTexture, frame);
-
-					const existingData = tileset.get(tileName);
-					const setData = !existingData ? [texture] : [...existingData, texture];
-					tileset.set(tileName, setData);
+					continue; // skip blank tiles
 				}
-			}
 
-			resolve(tileset);
-		});
+				const frame = new Rectangle(x * tileSize.width, y * tileSize.height, tileSize.width, tileSize.height);
+				const texture = new Texture(atlas.baseTexture, frame);
+
+				const existingData = tileset.get(tileName);
+				const setData = !existingData ? [texture] : [...existingData, texture];
+				tileset.set(tileName, setData);
+			}
+		}
 	}
 	catch (error)
 	{
 		console.error('Failed to load tileset', error);
-		resolve(new Map());
 	}
+
+	return tileset;
 });
 
 
 /**
- * GetTextureFromTileset
+ * Look up a/the texture for a tile given type and cardinals.
  * @param type Type of the tile to render.
  * @param cardinals Cardinal truthiness to lookup sprite from bitmask.
  * @returns a/the texture matching the computed bitmask, or Texture.WHITE if type doesn't fit any available bitmasks.

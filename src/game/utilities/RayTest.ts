@@ -5,7 +5,6 @@ import type { Mask } from '../types/Array2D';
 export { Vector };
 
 /**
- * CastResult
  * Interface describing return type of CastRay.
  */
 export interface CastResult
@@ -18,7 +17,6 @@ export interface CastResult
 }
 
 /**
- * CastRay
  * Casts a ray from a point on a mask until it hits maxLength or mask edge.
  * Adapted from C here: https://lodev.org/cgtutor/raycasting.html
  * @param mask Mask to test. 1/true represents a wall; 0/false represents free space.

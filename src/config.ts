@@ -1,8 +1,9 @@
 export default {
 	debug: true,
 
-	// Pixi Display
-	transparent: true,
+	// Rendering
+	width: 800,
+	height: 600,
 	antialias: true,
 	tileWidth: 5,
 	tileHeight: 5,
@@ -10,13 +11,18 @@ export default {
 	worldWidth: 32,
 	worldHeight: 24,
 
+	// Clocks
+	maxUpdateFPS: 30,
+
 	// Generation
 	rootGrassProbability: 0.2,
 
-	// Shaders
-	minimumGlobalIllumination: 0.5,
+	// Lighting
+	minimumGlobalIllumination: 0.3,
 	globalLightQuality: 5,
 	globalLightReflections: 0,
-	globalLightFalloff: 50, // 20 tiles max
+	globalLightFalloff: 50, // max light distance in tiles
+
+	// Shader defaults
 	windStrength: [0.08, 0.01]
 } as const;
