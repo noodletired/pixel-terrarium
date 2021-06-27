@@ -7,12 +7,13 @@ import {
 	tileFilters,
 	transparentTiles
 } from '../content/Tileset';
+import { Cardinals } from '../types/Cardinals';
 
-import type { Cardinals, TileType } from '../content/Tileset';
 import type { PointLight } from './Light';
+import type { TileType } from '../content/Tileset';
 import type { VectorLike } from './Vector';
 
-export type { Cardinals, TileType };
+export type { Cardinals, TileType, VectorLike };
 
 /**
  * Representation of a game tile.
@@ -28,7 +29,7 @@ export class Tile
 	private _type: TileType;
 	private _cardinals: Cardinals;
 
-	constructor(position: VectorLike, type: TileType, cardinals: Cardinals)
+	constructor(position: VectorLike, type: TileType, cardinals = new Cardinals('0000'))
 	{
 		this._position = Object.freeze({ ...position }); // copy and make immutable
 		this._type = type;

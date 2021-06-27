@@ -7,19 +7,19 @@ import { Degrees } from '/@/game/types/Angle';
 import { CastRay, Vector } from '/@/game/utilities/RayTest';
 import { plus3x3 } from '/@/game/utilities/MorphologyKernels';
 
-import type { WorldLayer } from '/@/game/types/World';
+import type { World } from '/@/game/types/World';
 
 
 /**
  * Computes global light level/occlusion assuming the world is lit top-down by a very large sun.
  * Rays are checked outward of every point.
- * @param layer Tile layer used to filter and block light.
+ * @param world Array2D of Tiles. Opaque tiles filter/block light.
  * @returns a normalized (0-1) greyscale bitmap of light intensity.
  */
-export const ComputeGlobalIllumination = (layer: WorldLayer): Bitmap =>
+export const ComputeGlobalIllumination = (world: World): Bitmap =>
 {
-	const wallMask = Mask.From(layer.Map(tile => !tile.isTransparent));
-	const skipMask = wallMask.Erode(plus3x3, false); // we can skip enclosed points
+	const wallMask = Mask.From(world.Map(tile => !tile.isTransparent));
+	const skipMask = wallMask.Erode(plus3x3, false); // we can skip fully enclosed tiles
 
 	return Bitmap.From(skipMask.Map((skip, i, row, col): number =>
 	{

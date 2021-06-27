@@ -7,7 +7,9 @@ import { Delay } from './utilities/Delay';
 import { Filter } from './types/Filter';
 import { LoadTileset } from './content/Tileset';
 
-import { BlitWorld, GenerateWorld } from './content/World';
+import { InitialiseInteractables, UpdateInteractibles } from './content/Interactable';
+import { InitialiseBackground } from './content/Background';
+import { InitialiseGlobalLighting } from './content/Lighting';
 
 /**
  * Initialises the game.
@@ -29,8 +31,9 @@ export const InitialiseGame = async (): Promise<void> =>
 		await Delay(100);
 	}
 
-	const world = GenerateWorld();
-	BlitWorld(renderer.scene, world);
+	InitialiseBackground();
+	InitialiseInteractables();
+	InitialiseGlobalLighting();
 
 	// Update loop
 	for await (const dt of clock.GetUpdates())
@@ -39,8 +42,7 @@ export const InitialiseGame = async (): Promise<void> =>
 		Filter.registeredFilters.forEach(filter => filter.Update(dt));
 
 		// TODO: Process tile updates => lighting updates
-
-		// TODO: Blit changes
+		UpdateInteractibles();
 
 		// Render the scene
 		renderer.RenderScene();

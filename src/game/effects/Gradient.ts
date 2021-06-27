@@ -1,4 +1,4 @@
-import { BaseTexture, Resource, Sprite, Texture } from 'pixi.js';
+import { ALPHA_MODES, BaseTexture, FORMATS, Resource, Sprite, TARGETS, TYPES, Texture, WRAP_MODES } from 'pixi.js';
 import type { GLTexture, Renderer } from 'pixi.js';
 
 // Support type definitions
@@ -43,6 +43,11 @@ export class GradientResource extends Resource
 		canvas.height = height;
 
 		const context = canvas.getContext('2d');
+		if (!context)
+		{
+			console.warn('Unable to generate gradient texture: could not create a 2D canvas context.');
+			return false;
+		}
 
 		const gradient = this.isVertical
 			? context.createLinearGradient(0, 0, 0, height)
@@ -60,8 +65,15 @@ export class GradientResource extends Resource
 
 		// Upload the texture to the GPU
 		const { gl } = renderer;
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.premultiplyAlpha);
-		gl.texImage2D(baseTexture.target, 0, baseTexture.format, baseTexture.format, baseTexture.type, canvas);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.alphaMode === ALPHA_MODES.UNPACK);
+		gl.texImage2D(
+			baseTexture.target ?? TARGETS.TEXTURE_2D,
+			0,
+			baseTexture.format ?? FORMATS.RGBA,
+			baseTexture.format ?? FORMATS.RGBA,
+			baseTexture.type ?? TYPES.FLOAT,
+			canvas
+		);
 
 		return true;
 	}

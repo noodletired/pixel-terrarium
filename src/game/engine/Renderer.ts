@@ -23,9 +23,7 @@ class GameRenderer
 	readonly scene = new Container();
 
 	private readonly layers: { name: string, container: Container|null }[] = [
-		{ name: 'gradient', container: null },
 		{ name: 'background', container: null },
-		{ name: 'midground', container: null },
 		{ name: 'interactable', container: null },
 		{ name: 'decoration', container: null },
 		{ name: 'lighting', container: null },
@@ -41,8 +39,7 @@ class GameRenderer
 		const layer = this.layers.find(({ name }) => layerName === name);
 		if (!layer)
 		{
-			console.warn('Could not set unknown layer container:', layerName);
-			return;
+			throw new ReferenceError(`Could not set unknown layer container: ${layerName}`);
 		}
 
 		// Remove previous layer from scene
@@ -56,17 +53,28 @@ class GameRenderer
 		layer.container = container;
 
 		const sceneIndex = this.layers.filter(({ container }) => !!container).indexOf(layer);
-		this.scene.addChildAt(sceneIndex);
+		this.scene.addChildAt(container, sceneIndex);
 	}
 
 	/**
-	 * Retrieve a container for a named layer.
+	 * Retrieve a container for a named layer. An empty container is created if it hasn't yet been.
 	 * @param layerName Name of the layer.
 	 * @returns The named container or null.
 	 */
-	GetLayer(layerName: string): Container|null
+	GetLayer(layerName: string): Container
 	{
-		return this.layers.find(({ name }) => layerName === name) ?? null;
+		const layer = this.layers.find(({ name }) => layerName === name);
+		if (!layer)
+		{
+			throw new ReferenceError(`Could not set unknown layer container: ${layerName}`);
+		}
+
+		if (!layer.container)
+		{
+			this.SetLayer(layerName, new Container());
+		}
+
+		return layer.container;
 	}
 
 	/**
