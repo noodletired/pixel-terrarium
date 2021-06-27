@@ -9,7 +9,7 @@ import { LoadTileset } from './content/Tileset';
 
 import { InitialiseInteractables, UpdateInteractibles } from './content/Interactable';
 import { InitialiseBackground } from './content/Background';
-import { InitialiseGlobalLighting } from './content/Lighting';
+import { InitialiseLighting } from './content/Lighting';
 
 /**
  * Initialises the game.
@@ -33,7 +33,7 @@ export const InitialiseGame = async (): Promise<void> =>
 
 	InitialiseBackground();
 	InitialiseInteractables();
-	InitialiseGlobalLighting();
+	InitialiseLighting();
 
 	// Update loop
 	for await (const dt of clock.GetUpdates())

@@ -9,7 +9,7 @@ import {
 } from '../content/Tileset';
 import { Cardinals } from '../types/Cardinals';
 
-import type { PointLight } from './Light';
+import { PointLight } from './Light';
 import type { TileType } from '../content/Tileset';
 import type { VectorLike } from './Vector';
 
@@ -86,7 +86,11 @@ export class Tile
 		// TODO: add event handlers
 
 		this.isTransparent = transparentTiles[_type] ?? false;
-		this.light = emissiveTiles[_type] ?? null;
+
+		const emissiveProperties = emissiveTiles[_type] ?? null;
+		this.light = (emissiveProperties
+			? new PointLight(this._position, emissiveProperties)
+			: null);
 
 		if (_type === 'void')
 		{

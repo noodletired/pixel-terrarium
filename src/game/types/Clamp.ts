@@ -8,6 +8,8 @@ export class Clamp
 	static readonly UINT8_NOWRAP = new Clamp(0, 255);
 	static readonly INT8 = new Clamp(-128, 127, true);
 	static readonly INT8_NOWRAP = new Clamp(-128, 127);
+	static readonly RGB = new Clamp(0, 0xFFFFFF);
+	static readonly RGBA = new Clamp(0, 0xFFFFFFFF);
 	static readonly POSITIVE = new Clamp(0);
 	static readonly POSITIVE_NONZERO = new Clamp(1);
 

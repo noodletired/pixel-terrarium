@@ -15,7 +15,7 @@ varying vec2 vFilterCoord;
 
 // Customs
 uniform highp float time;
-// TODO: add attribute or for interaction velocity
+// TODO: add attribute or for interaction velocity?
 uniform vec2 velocity; // e.g. from user input
 
 varying vec2 vUV;
@@ -33,7 +33,7 @@ void main(void)
 
 	// Define the wind
 	vec2 wind = vec2(
-		cos(normalizedScreenPosition.x + scaledTime),
+		cos(normalizedScreenPosition.x + scaledTime) + cos(normalizedScreenPosition.y + scaledTime * 1.5) * 0.5, // sway + twitch
 		sin(normalizedScreenPosition.y + scaledTime)
 	) * height * velocity * screenSize;
 

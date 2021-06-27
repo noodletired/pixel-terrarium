@@ -11,12 +11,12 @@ import bitmask13 from '/@/assets/bitmask-13.json'; // No basic, v uses t/b, h us
 import bitmask16 from '/@/assets/bitmask-16.json'; // Full 4-bit arrangement
 import bitmask4 from '/@/assets/bitmask-4.json'; // for grass
 
-import { PointLight } from '../types/Light';
 
 import windFilter from '../effects/WindFilter';
 
 import type { Cardinals } from '../types/Cardinals';
 import type { Filter } from 'pixi.js';
+import type { PointLightProperties } from '../types/Light';
 
 export type { Cardinals };
 export type { Sprite, Texture, Filter };
@@ -24,7 +24,7 @@ export type { Sprite, Texture, Filter };
 
 export type Tileset = Map<string, Texture[]>;
 export type BitmaskTileLookup = Record<string, string | string[]>; // look up one or more tile suffixes based on Cardinals
-export type TileType = 'dirt' | 'rock' | 'vine' | 'dark' | 'back' | 'root' | 'grass' | 'void';
+export type TileType = 'dirt' | 'rock' | 'vine' | 'dark' | 'back' | 'grass' | 'root' | 'ore' | 'void';
 export type BitmaskType = '4' | '11' | '13' | '16' | `indexed-${number}` | 'none';
 
 export const tileBitmaskType: Record<TileType, BitmaskType> = {
@@ -33,8 +33,9 @@ export const tileBitmaskType: Record<TileType, BitmaskType> = {
 	vine: '16',
 	dark: '16',
 	back: '16',
-	root: 'indexed-10',
 	grass: '4',
+	root: 'indexed-10',
+	ore: 'indexed-1',
 	void: 'none'
 } as const;
 
@@ -60,7 +61,10 @@ export const transparentTiles: Record<string, boolean> = {
 	void: true
 } as const;
 
-export const emissiveTiles: Record<string, PointLight> = {} as const;
+export const emissiveTiles: Record<string, PointLightProperties> = {
+	ore: { radius: 2, tint: 0x0090FF },
+	// TODO: add more!
+} as const;
 
 // Actual tileset
 export const tileset: Tileset = new Map();

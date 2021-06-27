@@ -19,7 +19,7 @@ import type { TileType } from '../content/Tileset';
 export const BlitBitmap = (
 	container: Container,
 	bitmap: Bitmap,
-	colorMode: 'grey'|'alpha'|'color',
+	colorMode: 'grey'|'alpha'|'rgb'|'rgba',
 	blendMode: BLEND_MODES = BLEND_MODES.NORMAL,
 	scale = 1
 ): void =>
@@ -33,19 +33,29 @@ export const BlitBitmap = (
 		sprite.position.set(col * scaledTileSize.width * scale, row * scaledTileSize.height * scale);
 		sprite.blendMode = blendMode;
 
-		if (colorMode === 'grey')
+		switch (colorMode)
 		{
-			const u8Value = Clamp.UINT8_NOWRAP.Apply(value) & 0xff;
-			sprite.tint = (u8Value << 16) | (u8Value << 8) | u8Value;
-		}
-		else if (colorMode === 'alpha')
-		{
-			const u8Value = Clamp.UINT8_NOWRAP.Apply(value);
-			sprite.alpha = (u8Value) / 255;
-		}
-		else
-		{
-			sprite.tint = new Clamp(0, 0xffffff).Apply(value) & 0xffffff;
+			case 'grey':
+			{
+				const u8Value = Clamp.UINT8_NOWRAP.Apply(value) & 0xff;
+				sprite.tint = (u8Value << 16) | (u8Value << 8) | u8Value;
+				break;
+			}
+			case 'alpha':
+			{
+				const u8Value = Clamp.UINT8_NOWRAP.Apply(value);
+				sprite.alpha = (u8Value) / 255;
+				break;
+			}
+			case 'rgb':
+				sprite.tint = Clamp.RGB.Apply(value & 0xffffff);
+				break;
+			case 'rgba':
+				sprite.tint = Clamp.RGB.Apply((value & 0xffffffff) >> 8 & 0xffffff);
+				sprite.alpha = Clamp.UINT8_NOWRAP.Apply(value & 0xff);
+				break;
+			default:
+				break;
 		}
 
 		container.addChild(sprite);

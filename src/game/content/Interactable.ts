@@ -7,6 +7,7 @@ import { GenerateWorldFoliage } from './generation/Foliage';
 import { GenerateWorldLand } from './generation/Land';
 
 import { FlattenWorldLayers, World } from '../types/World';
+import { GenerateWorldOres } from './generation/Ores';
 
 
 // Module locals
@@ -22,9 +23,10 @@ export const InitialiseInteractables = (): void =>
 	// Generate the layers
 	const landTiles = GenerateWorldLand();
 	const foliageTiles = GenerateWorldFoliage(landTiles);
+	const oreTiles = GenerateWorldOres(landTiles);
 
 	// Combine the layers
-	world = FlattenWorldLayers([landTiles, foliageTiles]);
+	world = FlattenWorldLayers([landTiles, oreTiles, foliageTiles]);
 
 	// Prepare world for interaction and rendering
 	world.ForEach(tile =>
@@ -36,6 +38,7 @@ export const InitialiseInteractables = (): void =>
 	// Attach to renderer
 	renderer.SetLayer('interactable', container);
 };
+
 
 /**
  * Attaches interaction events to tiles.

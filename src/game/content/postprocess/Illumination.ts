@@ -1,8 +1,8 @@
 import config from '/@/config';
 
-import { Bitmap, Mask } from '/@/game/types/Array2D';
+import { Bitmap, Clamp, Mask } from '/@/game/types/Array2D';
 import { Degrees } from '/@/game/types/Angle';
-//import { PointLight } from '/@/game/types/Light';
+import { PointLight } from '/@/game/types/Light';
 
 import { CastRay, Vector } from '/@/game/utilities/RayTest';
 import { plus3x3 } from '/@/game/utilities/MorphologyKernels';
@@ -81,12 +81,36 @@ export const ComputeGlobalLightAtPoint = (
 
 
 /**
- * Computes a local lightmap from given point lights.
- * @param wallMask Mask indicating occluders.
+ * Computes a local lightmap from emissive tiles.
+ * @param world Array2D of Tiles. Opaque tiles do NOT filter/block light.
  * @returns a colour bitmap.
  */
-/*export const ComputePointIllumination = (lights: PointLight[], wallMask: Mask): Bitmap =>
+export const ComputeLocalIllumination = (world: World): Bitmap =>
 {
-	// TODO
+	const wallMask = Mask.From(world.Map(tile => !tile.isTransparent));
+	const skipMask = wallMask.Erode(plus3x3, false); // we can skip fully enclosed tiles
+
+	const lights: PointLight[] = [];
+	world.ForEach(tile =>
+	{
+		if (tile.light)
+		{
+			lights.push(tile.light);
+		}
+	});
+
+	return Bitmap.From(skipMask.Map((skip, i, row, col): number =>
+	{
+		if (skip) // completely enclosed
+		{
+			return 0;
+		}
+
+		const lightLevel = lights.reduce<number>((level, light) =>
+		{
+			return 0xff000033;
+		}, 0);
+
+		return Clamp.RGBA.Apply(lightLevel);
+	}));
 };
-*/
