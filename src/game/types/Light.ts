@@ -1,8 +1,9 @@
 import { Clamp } from './Clamp';
+import { Colour } from './Colour';
 import { Vector } from './Vector';
 
 import type { VectorLike } from './Vector';
-export type { VectorLike };
+export type { VectorLike, Colour };
 
 /**
  * Interface for non-positional light properties
@@ -20,11 +21,11 @@ export class PointLight implements PointLightProperties
 {
 	readonly position: Vector;
 	readonly radius: number; // in tiles
-	readonly tint: number;
+	readonly tint: Colour;
 
 	constructor(position: VectorLike, properties: PointLightProperties);
-	constructor(position: VectorLike, radius: number, tint: number);
-	constructor(position: VectorLike, ...args: [number, number] | [PointLightProperties])
+	constructor(position: VectorLike, radius: number, tint: number | Colour);
+	constructor(position: VectorLike, ...args: [number, number | Colour] | [PointLightProperties])
 	{
 		this.position = new Vector(position);
 
@@ -35,11 +36,19 @@ export class PointLight implements PointLightProperties
 		}
 		else
 		{
-			([radius, tint] = args);
+			[radius] = args;
+			if (typeof args[1] === 'number')
+			{
+				[, tint] = args;
+			}
+			else
+			{
+				tint = args[1].asHex;
+			}
 		}
 
 		this.radius = radius;
-		this.tint = new Clamp(0, 0xFFFFFF).Apply(tint);
+		this.tint = new Colour(tint, true);
 	}
 }
 

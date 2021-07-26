@@ -62,7 +62,7 @@ export const transparentTiles: Record<string, boolean> = {
 } as const;
 
 export const emissiveTiles: Record<string, PointLightProperties> = {
-	ore: { radius: 2, tint: 0x0090FF },
+	ore: { radius: 2, tint: 0x0090FFFF },
 	// TODO: add more!
 } as const;
 

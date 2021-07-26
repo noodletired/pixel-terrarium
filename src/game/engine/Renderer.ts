@@ -26,6 +26,7 @@ class GameRenderer
 		{ name: 'background', container: null },
 		{ name: 'interactable', container: null },
 		{ name: 'decoration', container: null },
+		{ name: 'shading', container: null },
 		{ name: 'lighting', container: null },
 	];
 

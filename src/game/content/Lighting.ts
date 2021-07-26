@@ -9,9 +9,13 @@ import { BlitBitmap } from '../utilities/Array2DRender';
 
 
 // Module locals
-const renderContainer = new Container();
-const renderTexture = RenderTexture.create({ width: config.width, height: config.height });
-const renderSprite = new Sprite(renderTexture);
+const shadowContainer = new Container();
+const shadowTexture = RenderTexture.create({ width: config.width, height: config.height });
+const shadowSprite = new Sprite(shadowTexture);
+
+const lightContainer = new Container();
+const lightTexture = RenderTexture.create({ width: config.width, height: config.height });
+const lightSprite = new Sprite(lightTexture);
 
 /**
  * Initialises local and global lighting.
@@ -26,14 +30,18 @@ export const InitialiseLighting = (): void =>
 	// Compute world lighting and draw to container
 	const globalLighting = ComputeGlobalIllumination(world).Multiply(255);
 	const localLighting = ComputeLocalIllumination(world);
-	BlitBitmap(renderContainer, globalLighting, 'grey', BLEND_MODES.ADD);
-	BlitBitmap(renderContainer, localLighting, 'rgba', BLEND_MODES.ADD);
+	BlitBitmap(shadowContainer, globalLighting, 'grey', BLEND_MODES.ADD);
+	BlitBitmap(lightContainer, localLighting, 'rgba', BLEND_MODES.ADD);
 
 	// Render container to texture with blur filter applied
-	renderContainer.filters = [new filters.BlurFilter(10, 2, undefined, 7)];
-	renderer.context.render(renderContainer, { renderTexture });
+	shadowContainer.filters = [new filters.BlurFilter(10, 2, undefined, 7)];
+	lightContainer.filters = [new filters.BlurFilter(10, 2, undefined, 7)];
+	renderer.context.render(shadowContainer, { renderTexture: shadowTexture });
+	renderer.context.render(lightContainer, { renderTexture: lightTexture });
 
-	// Blend with MULTIPLY operation, and add to renderer.
-	renderSprite.blendMode = BLEND_MODES.MULTIPLY;
-	renderer.GetLayer('lighting').addChild(renderSprite);
+	// Blend with correct operation, and add to renderer.
+	shadowSprite.blendMode = BLEND_MODES.MULTIPLY;
+	lightSprite.blendMode = BLEND_MODES.ADD;
+	renderer.GetLayer('shading').addChild(shadowSprite);
+	renderer.GetLayer('lighting').addChild(lightSprite);
 };

@@ -1,6 +1,7 @@
 import config from '/@/config';
 
-import { Bitmap, Clamp, Mask } from '/@/game/types/Array2D';
+import { Bitmap, Mask } from '/@/game/types/Array2D';
+import { Colour } from '/@/game/types/Colour';
 import { Degrees } from '/@/game/types/Angle';
 import { PointLight } from '/@/game/types/Light';
 
@@ -99,6 +100,8 @@ export const ComputeLocalIllumination = (world: World): Bitmap =>
 		}
 	});
 
+	console.warn(lights);
+
 	return Bitmap.From(skipMask.Map((skip, i, row, col): number =>
 	{
 		if (skip) // completely enclosed
@@ -106,11 +109,12 @@ export const ComputeLocalIllumination = (world: World): Bitmap =>
 			return 0;
 		}
 
-		const lightLevel = lights.reduce<number>((level, light) =>
+		const lightLevel = lights.reduce<Colour>((level, light) =>
 		{
-			return 0xff000033;
-		}, 0);
+			const strength = Math.max(light.radius - light.position.Distance({ x: col, y: row }), 0) / light.radius;
+			return level.Multiply(light.tint.Fade(strength)); // Change to Blend?
+		}, new Colour(0, 0, 0, 255));
 
-		return Clamp.RGBA.Apply(lightLevel);
+		return lightLevel.asHex;
 	}));
 };
