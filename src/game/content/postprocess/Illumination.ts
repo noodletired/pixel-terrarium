@@ -100,8 +100,6 @@ export const ComputeLocalIllumination = (world: World): Bitmap =>
 		}
 	});
 
-	console.warn(lights);
-
 	return Bitmap.From(skipMask.Map((skip, i, row, col): number =>
 	{
 		if (skip) // completely enclosed
@@ -112,9 +110,9 @@ export const ComputeLocalIllumination = (world: World): Bitmap =>
 		const lightLevel = lights.reduce<Colour>((level, light) =>
 		{
 			const strength = Math.max(light.radius - light.position.Distance({ x: col, y: row }), 0) / light.radius;
-			return level.Multiply(light.tint.Fade(strength)); // Change to Blend?
-		}, new Colour(0, 0, 0, 255));
+			return level.Add(light.tint.Fade(strength));
+		}, new Colour(0, 0, 0, 0));
 
-		return lightLevel.asHex;
+		return lightLevel.asPMA;
 	}));
 };

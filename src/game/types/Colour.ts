@@ -23,15 +23,6 @@ export class Colour
 		this.#r = Clamp.UINT8_NOWRAP.Apply(r);
 	}
 
-	get b(): number
-	{
-		return this.#b;
-	}
-	set b(b: number): void
-	{
-		this.#b = Clamp.UINT8_NOWRAP.Apply(b);
-	}
-
 	get g(): number
 	{
 		return this.#g;
@@ -39,6 +30,15 @@ export class Colour
 	set g(g: number): void
 	{
 		this.#g = Clamp.UINT8_NOWRAP.Apply(g);
+	}
+
+	get b(): number
+	{
+		return this.#b;
+	}
+	set b(b: number): void
+	{
+		this.#b = Clamp.UINT8_NOWRAP.Apply(b);
 	}
 
 	get a(): number
@@ -51,14 +51,14 @@ export class Colour
 	}
 
 
-	constructor(r: number, g: number, b: number, a = 255);
-	constructor(hex: number, alpha = false);
-	constructor(...args: [number, number, number, number] | [number, boolean])
+	constructor(r: number, g: number, b: number, a?: number);
+	constructor(hex: number, alpha?: boolean);
+	constructor(...args: [number, number, number] | [number, number, number, number] | [number] | [number, boolean])
 	{
 		if (args.length <= 2)
 		{
 			const [hex, useAlpha] = args;
-			if (useAlpha)
+			if (useAlpha !== false) // must be explicit; could be undefined
 			{
 				this.#r = (hex & 0xff000000) >> 24;
 				this.#g = (hex & 0x00ff0000) >> 16;
@@ -78,17 +78,35 @@ export class Colour
 			this.r = r;
 			this.g = g;
 			this.b = b;
-			this.a = a;
+			this.a = a ?? 255;
 		}
 	}
 
 	/**
-	 * Converts to hex number
+	 * Converts to 32-bit hex number.
 	 */
-	get asHex(): number
+	get asRGBA(): number
 	{
 		const { r, g, b, a } = this;
 		return r << 24 | g << 16 | b << 8 | a;
+	}
+
+	/**
+	 * Converts to 24-bit hex number, discarding alpha.
+	 */
+	get asRGB(): number
+	{
+		const { r, g, b } = this;
+		return r << 16 | g << 8 | b;
+	}
+
+	/**
+	 * Converts to 24-bit hex number, premultiplying alpha.
+	 */
+	get asPMA(): number
+	{
+		const { a } = this;
+		return this.Multiply(a << 24 | a << 16 | a << 8).asRGB;
 	}
 
 	/**
@@ -103,7 +121,7 @@ export class Colour
 			colour = new Colour(colour, true);
 		}
 
-		const clone = new Colour(this.asHex);
+		const clone = new Colour(this.asRGBA);
 		Colour.lookupRGBA.forEach(ch => clone[ch] += colour[ch]);
 		return clone;
 	}
@@ -120,7 +138,7 @@ export class Colour
 			colour = new Colour(colour, true);
 		}
 
-		const clone = new Colour(this.asHex);
+		const clone = new Colour(this.asRGBA);
 		Colour.lookupRGBA.forEach(ch => clone[ch] *= colour[ch] / 255);
 		return clone;
 	}
@@ -138,10 +156,10 @@ export class Colour
 			colour = new Colour(colour, true);
 		}
 
-		const BlendRGB = (a, b, t) => Math.sqrt((1 - factor) * a ** 2 + t * b ** 2) / 255; // technically incorrect due to gamma correction
+		const BlendRGB = (a, b, t) => Math.sqrt((1 - factor) * a ** 2 + t * b ** 2); // technically incorrect due to gamma correction
 		const BlendAlpha = (a, b, t) => (1 - factor) * a + t * b;
 
-		const clone = new Colour(this.asHex);
+		const clone = new Colour(this.asRGBA);
 		Colour.lookupRGB.forEach(ch => clone[ch] = BlendRGB(clone[ch], colour[ch], factor));
 		clone.a = BlendAlpha(clone.a, colour.a, factor);
 		return clone;

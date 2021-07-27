@@ -31,7 +31,7 @@ export const InitialiseLighting = (): void =>
 	const globalLighting = ComputeGlobalIllumination(world).Multiply(255);
 	const localLighting = ComputeLocalIllumination(world);
 	BlitBitmap(shadowContainer, globalLighting, 'grey', BLEND_MODES.ADD);
-	BlitBitmap(lightContainer, localLighting, 'rgba', BLEND_MODES.ADD);
+	BlitBitmap(lightContainer, localLighting, 'rgb', BLEND_MODES.ADD);
 
 	// Render container to texture with blur filter applied
 	shadowContainer.filters = [new filters.BlurFilter(10, 2, undefined, 7)];

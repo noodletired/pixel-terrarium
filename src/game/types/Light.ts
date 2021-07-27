@@ -43,7 +43,7 @@ export class PointLight implements PointLightProperties
 			}
 			else
 			{
-				tint = args[1].asHex;
+				tint = args[1].asRGBA;
 			}
 		}
 
