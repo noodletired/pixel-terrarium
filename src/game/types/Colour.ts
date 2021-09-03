@@ -6,8 +6,8 @@ import { Clamp } from './Clamp';
  */
 export class Colour
 {
-	private static lookupRGBA = ['r', 'g', 'b', 'a'];
-	private static lookupRGB = ['r', 'g', 'b'];
+	private static lookupRGBA = ['r', 'g', 'b', 'a'] as Extract<keyof Colour, 'r'|'g'|'b'|'a'>[];
+	private static lookupRGB = ['r', 'g', 'b'] as Extract<keyof Colour, 'r'|'g'|'b'>[];
 
 	#r = 0;
 	#g = 0;
@@ -18,7 +18,7 @@ export class Colour
 	{
 		return this.#r;
 	}
-	set r(r: number): void
+	set r(r: number)
 	{
 		this.#r = Clamp.UINT8_NOWRAP.Apply(r);
 	}
@@ -27,7 +27,7 @@ export class Colour
 	{
 		return this.#g;
 	}
-	set g(g: number): void
+	set g(g: number)
 	{
 		this.#g = Clamp.UINT8_NOWRAP.Apply(g);
 	}
@@ -36,7 +36,7 @@ export class Colour
 	{
 		return this.#b;
 	}
-	set b(b: number): void
+	set b(b: number)
 	{
 		this.#b = Clamp.UINT8_NOWRAP.Apply(b);
 	}
@@ -45,14 +45,16 @@ export class Colour
 	{
 		return this.#a;
 	}
-	set a(a: number): void
+	set a(a: number)
 	{
 		this.#a = Clamp.UINT8_NOWRAP.Apply(a);
 	}
 
 
-	constructor(r: number, g: number, b: number, a?: number);
-	constructor(hex: number, alpha?: boolean);
+	constructor(r: number, g: number, b: number);
+	constructor(r: number, g: number, b: number, a: number);
+	constructor(hex: number);
+	constructor(hex: number, alpha: boolean);
 	constructor(...args: [number, number, number] | [number, number, number, number] | [number] | [number, boolean])
 	{
 		if (args.length <= 2)
@@ -75,6 +77,12 @@ export class Colour
 		else
 		{
 			const [r, g, b, a] = args;
+
+			if (typeof g !== 'number' || typeof b !== 'number')
+			{
+				throw new TypeError('Invalid type supplied to Colour constructor');
+			}
+
 			this.r = r;
 			this.g = g;
 			this.b = b;
@@ -110,19 +118,30 @@ export class Colour
 	}
 
 	/**
+	 * Helper to convert a colour or number into a workable Colour object.
+	 * @param colour Either a Colour or hex representation.
+	 * @returns a new Colour object.
+	 */
+	private Colourize(colour: Colour | number): Colour
+	{
+		if (typeof colour === 'number')
+		{
+			colour = new Colour(colour, true); // assumes alpha is present
+		}
+		return colour;
+	}
+
+	/**
 	 * Mix two colours additively.
 	 * @param colour Either another Colour or hex representation.
 	 * @returns a new Colour object.
 	 */
 	Add(colour: Colour | number): Colour
 	{
-		if (typeof colour === 'number')
-		{
-			colour = new Colour(colour, true);
-		}
+		const indexableColour = this.Colourize(colour);
 
 		const clone = new Colour(this.asRGBA);
-		Colour.lookupRGBA.forEach(ch => clone[ch] += colour[ch]);
+		Colour.lookupRGBA.forEach(ch => clone[ch] += indexableColour[ch]);
 		return clone;
 	}
 
@@ -133,13 +152,10 @@ export class Colour
 	 */
 	Multiply(colour: Colour | number): Colour
 	{
-		if (typeof colour === 'number')
-		{
-			colour = new Colour(colour, true);
-		}
+		const indexableColour = this.Colourize(colour);
 
 		const clone = new Colour(this.asRGBA);
-		Colour.lookupRGBA.forEach(ch => clone[ch] *= colour[ch] / 255);
+		Colour.lookupRGBA.forEach(ch => clone[ch] *= indexableColour[ch] / 255);
 		return clone;
 	}
 
@@ -151,17 +167,14 @@ export class Colour
 	 */
 	Blend(colour: Colour | number, factor: number): Colour
 	{
-		if (typeof colour === 'number')
-		{
-			colour = new Colour(colour, true);
-		}
+		const indexableColour = this.Colourize(colour);
 
-		const BlendRGB = (a, b, t) => Math.sqrt((1 - factor) * a ** 2 + t * b ** 2); // technically incorrect due to gamma correction
-		const BlendAlpha = (a, b, t) => (1 - factor) * a + t * b;
+		const BlendRGB = (a: number, b: number, t: number): number => Math.sqrt((1 - factor) * a ** 2 + t * b ** 2); // technically incorrect due to gamma correction
+		const BlendAlpha = (a: number, b: number, t: number): number => (1 - factor) * a + t * b;
 
 		const clone = new Colour(this.asRGBA);
-		Colour.lookupRGB.forEach(ch => clone[ch] = BlendRGB(clone[ch], colour[ch], factor));
-		clone.a = BlendAlpha(clone.a, colour.a, factor);
+		Colour.lookupRGB.forEach(ch => clone[ch] = BlendRGB(clone[ch], indexableColour[ch], factor));
+		clone.a = BlendAlpha(clone.a, indexableColour.a, factor);
 		return clone;
 	}
 

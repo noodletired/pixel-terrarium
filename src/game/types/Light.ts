@@ -17,7 +17,7 @@ export interface PointLightProperties
 /**
  * Representation of a point lamp.
  */
-export class PointLight implements PointLightProperties
+export class PointLight
 {
 	readonly position: Vector;
 	readonly radius: number; // in tiles

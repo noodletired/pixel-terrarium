@@ -23,6 +23,9 @@ export default {
 	globalLightReflections: 0,
 	globalLightFalloff: 50, // max light distance in tiles
 
+	// Weather
+	weatherParticleCount: 200,
+
 	// Shader defaults
 	windStrength: [0.08, 0.01]
 } as const;

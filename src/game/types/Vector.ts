@@ -86,6 +86,26 @@ export class Vector implements VectorLike
 		}
 	}
 
+	Set(arg: ScalarOrVectorLike): this
+	{
+		const { x, y } = this.Vectorise(arg);
+		this.x = x;
+		this.y = y;
+		return this;
+	}
+
+	SetX(x: number): this
+	{
+		this.x = x;
+		return this;
+	}
+
+	SetY(y: number): this
+	{
+		this.y = y;
+		return this;
+	}
+
 	Add(arg: ScalarOrVectorLike): this
 	{
 		const { x, y } = this.Vectorise(arg);

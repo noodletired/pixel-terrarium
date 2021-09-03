@@ -8,6 +8,7 @@ import { Filter } from './types/Filter';
 import { LoadTileset } from './content/Tileset';
 
 import { InitialiseInteractables, UpdateInteractibles } from './content/Interactable';
+import { InitialiseWeather, UpdateWeather } from './content/Weather';
 import { InitialiseBackground } from './content/Background';
 import { InitialiseLighting } from './content/Lighting';
 
@@ -33,6 +34,7 @@ export const InitialiseGame = async (): Promise<void> =>
 
 	InitialiseBackground();
 	InitialiseInteractables();
+	InitialiseWeather();
 	InitialiseLighting();
 
 	// Update loop
@@ -43,6 +45,7 @@ export const InitialiseGame = async (): Promise<void> =>
 
 		// TODO: Process tile updates => lighting updates
 		UpdateInteractibles();
+		UpdateWeather(dt);
 
 		// Render the scene
 		renderer.RenderScene();

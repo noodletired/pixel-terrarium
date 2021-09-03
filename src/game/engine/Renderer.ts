@@ -75,7 +75,7 @@ class GameRenderer
 			this.SetLayer(layerName, new Container());
 		}
 
-		return layer.container;
+		return layer.container!;
 	}
 
 	/**
