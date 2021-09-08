@@ -33,6 +33,7 @@ export class Particle
 	opacity: Controllable<number>;
 	rotation: Controllable<number>;
 	collisionTest: ((newPosition: Vector, particle: Particle) => ParticleCollisionAction) | null;
+	deathAction: ((particle: Particle) => void) | null;
 
 	// percentage age of the particle
 	get t(): number
@@ -43,7 +44,7 @@ export class Particle
 	// whether age exceeds lifetime
 	get isDead(): boolean
 	{
-		return this.age > this.lifetime;
+		return this.age >= this.lifetime;
 	}
 
 	/**
@@ -62,6 +63,7 @@ export class Particle
 		opacity?: Controllable<number>;
 		rotation?: Controllable<number>;
 		collisionTest?: ((newPosition: Vector, particle: Particle) => ParticleCollisionAction);
+		deathAction?: ((particle: Particle) => void);
 	})
 	{
 		this.ID = globalIDTracker++;
@@ -78,6 +80,7 @@ export class Particle
 		this.rotation = options.rotation ?? 0;
 
 		this.collisionTest = options.collisionTest ?? null;
+		this.deathAction = options.deathAction ?? null;
 	}
 
 	/**
@@ -101,6 +104,11 @@ export class Particle
 		// TODO: fix scaling
 		//const scale = IsControlled(this.scale) ? this.scale(t) : this.scale;
 		//sprite.scale.x;
+
+		if (this.deathAction && this.isDead)
+		{
+			this.deathAction(this);
+		}
 	}
 
 	/**

@@ -1,6 +1,6 @@
 import config from '/@/config';
 
-import { COLLIDE_X, COLLIDE_Y, CollideFlags, NO_COLLIDE } from '/@/game/types/Collision';
+import { COLLIDE_X, COLLIDE_XY, COLLIDE_Y, CollideFlags, NO_COLLIDE } from '/@/game/types/Collision';
 import { scaledTileSize } from '../Tileset';
 
 import { Clamp } from '/@/game/types/Clamp';
@@ -37,17 +37,6 @@ export const CheckScreenCollision = (world: World, previous: Vector, current: Ve
 		const yTile = world.GetAt(rowClamp.Apply(previousTile.y + dy), colClamp.Apply(previousTile.x));
 
 		return (!xTile.isTransparent ? COLLIDE_X : 0) | (!yTile.isTransparent ? COLLIDE_Y : 0);
-
-
-		// super simple approach, we haven't tried to exceed one tile distance
-		const { isTransparent } = world.GetAt(currentTile.y, currentTile.x);
-		if (isTransparent) // all OK
-		{
-			return NO_COLLIDE;
-		}
-
-		// Check side
-		return GetCollisionOrientation(previousTile, currentTile);
 	}
 
 	// Else we need to raycast
@@ -56,9 +45,57 @@ export const CheckScreenCollision = (world: World, previous: Vector, current: Ve
 };
 
 /**
+ * Checks screen position vs world tile location for collision, ignoring transparent tiles.
+ * @param world  Game world.
+ * @param previous  Old position in screen space to test.
+ * @param current  New position in screen space to test.
+ * @returns expected collision location.
+ */
+export const GetScreenCollisionLocation = (world: World, previous: Vector, current: Vector): Vector =>
+{
+	const { width, height } = config;
+	if (current.x >= width || current.y >= height || current.x < 0 || current.y < 0)
+	{
+		return new Vector(); // we don't deal with outside collisions
+	}
+
+	const previousTile = previous.Copy().Divide({ x: scaledTileSize.width, y: scaledTileSize.height }).Floor(); // x: col, y: row
+	const currentTile = current.Copy().Divide({ x: scaledTileSize.width, y: scaledTileSize.height }).Floor(); // x: col, y: row
+
+	// If within one tile distance
+	if (currentTile.Distance(previousTile) <= Math.SQRT2)
+	{
+		const rowClamp = new Clamp(0, world.height - 1);
+		const colClamp = new Clamp(0, world.width - 1);
+
+		// check ->x, ->y
+		const { x: dx, y: dy } = currentTile.Copy().Subtract(previousTile).Cardinalise();
+		const xTile = world.GetAt(rowClamp.Apply(previousTile.y), colClamp.Apply(previousTile.x + dx));
+		const yTile = world.GetAt(rowClamp.Apply(previousTile.y + dy), colClamp.Apply(previousTile.x));
+
+		const orientation = (!xTile.isTransparent ? COLLIDE_X : 0) | (!yTile.isTransparent ? COLLIDE_Y : 0);
+		switch (orientation)
+		{
+			case COLLIDE_X:
+				return AlignToWorld(current).SetY(previous.y);
+			case COLLIDE_Y:
+				return AlignToWorld(current).SetX(previous.x);
+			case COLLIDE_XY:
+				return AlignToWorld(current);
+			default:
+				throw new Exception('Should never get here if we checked for collision first!');
+		}
+	}
+
+	// Else we need to raycast
+	// TODO
+	return current.Copy();
+};
+
+/**
  * Returns collision flags if a collision between two points is known.
  */
-const GetCollisionOrientation = (startTile: Vector, endTile: Vector): CollideFlags =>
+export const GetCollisionOrientation = (startTile: Vector, endTile: Vector): CollideFlags =>
 {
 	let flags: CollideFlags = NO_COLLIDE;
 	const d = endTile.Copy().Subtract(startTile);
@@ -74,3 +111,14 @@ const GetCollisionOrientation = (startTile: Vector, endTile: Vector): CollideFla
 
 	return flags;
 };
+
+/**
+ * Align a vector to the world grid, top-left of tile.
+ * @param position  Vector to copy.
+ * @returns a new Vector aligned to the world grid (top-left of tile).
+ */
+export const AlignToWorld = (position: Vector): Vector => position
+	.Copy()
+	.Divide({ x: scaledTileSize.width, y: scaledTileSize.height }) // x: col, y: row
+	.Floor()
+	.Multiply({ x: scaledTileSize.width, y: scaledTileSize.height });

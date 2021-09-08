@@ -25,6 +25,7 @@ export default {
 
 	// Weather
 	weatherParticleCount: 200,
+	weatherSecondaryParticleCount: 100,
 
 	// Shader defaults
 	windStrength: [0.08, 0.01]
