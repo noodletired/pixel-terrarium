@@ -31,8 +31,6 @@ export const InitialiseWeather = (): void =>
 
 	weatherContainer.addChild(...particles.map(particle => particle.sprite));
 	renderer.GetLayer('decoration').addChild(weatherContainer);
-
-	console.log(particles);
 };
 
 /**

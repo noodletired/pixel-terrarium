@@ -47,6 +47,10 @@ export const GenerateWorldFoliage = (land: WorldLayer): WorldLayer =>
 		{
 			cardinals = CardinalsFromMask(landMask, row + 1, col);
 		}
+		else if (type === 'root')
+		{
+			cardinals = new Cardinals(0);
+		}
 		else
 		{
 			return null;

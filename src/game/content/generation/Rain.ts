@@ -55,7 +55,7 @@ export const GenerateRain = (world: World, container: Container): Particle[] =>
 					sprite,
 					opacity: opacityFunc,
 					rotation: rotationFunc,
-					deathAction(particle: Particle): void // self-rest
+					deathAction(particle: Particle): void // self-reset
 					{
 						container.removeChild(particle.sprite);
 						particles.splice(particles.indexOf(particle), 1);
