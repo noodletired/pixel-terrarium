@@ -19,7 +19,8 @@
 		"strict": true,
 		"target": "esnext",
 		"types": [
-			"vite/client"
+			"vite/client",
+			"jest"
 		]
 	},
 	"include": [

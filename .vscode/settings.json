@@ -14,5 +14,7 @@
 	"stylelint.enable": true,
 	"typescript.validate.enable": false, // we use eslint for this
 	"css.validate": false,
-	"scss.validate": false
+	"scss.validate": false,
+	"editor.insertSpaces": false,
+	"editor.tabSize": 2
 }
