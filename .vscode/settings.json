@@ -1,7 +1,7 @@
 {
 	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": true,
-		"source.fixAll.stylelint": true
+		"source.fixAll.eslint": "explicit",
+		"source.fixAll.stylelint": "explicit"
 	},
 	"editor.formatOnSave": false, // prevent vscode internally trying to break our styles
 	"eslint.codeActionsOnSave.mode": "all", // "problems" is faster but only fixes some
@@ -11,12 +11,6 @@
 	"npm.autoDetect": "on",
 	"npm.enableRunFromFolder": true,
 	"stylelint.configBasedir": ".",
-	"stylelint.configOverrides": {
-		"ignoreFiles": [
-			"node_modules",
-			"dist"
-		]
-	},
 	"stylelint.enable": true,
 	"typescript.validate.enable": false, // we use eslint for this
 	"css.validate": false,
