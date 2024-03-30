@@ -83,6 +83,39 @@ export const CastRay = (
 		// Check mask
 		if (mask.GetAt(position.y, position.x))
 		{
+			// FIXME: check if we've hit the corner of an edge near-exactly and give leniency
+			// FIXME: this is WRONG
+			const isIntermediate = i % 2 === 0; // we know we're at an intermediate step and should do edge case checks
+			if (isIntermediate)
+			{
+				let isInlineFree = false; // if the next stepped cell in direction of travel is free
+				let isPerpendicularFree = false; // if the perpendicular cell is free
+				if (side === 0)
+				{
+					const inlineY = position.y + step.y;
+					if (inlineY > 0 && inlineY < height)
+					{
+						isInlineFree = !mask.GetAt(inlineY, position.x);
+						isPerpendicularFree = !mask.GetAt(inlineY, position.x - step.x);
+					}
+				}
+				else
+				{
+					const inlineX = position.x + step.x;
+					if (inlineX > 0 && inlineX < width)
+					{
+						isInlineFree = !mask.GetAt(position.y, inlineX);
+						isPerpendicularFree = !mask.GetAt(position.y - step.y, inlineX);
+						console.warn(position, step, isInlineFree, isPerpendicularFree);
+					}
+				}
+
+				if (isInlineFree && isPerpendicularFree)
+				{
+					continue; // no-collide!
+				}
+			}
+
 			if (results.hitCount === 0)
 			{
 				results.firstHitDistance = length;

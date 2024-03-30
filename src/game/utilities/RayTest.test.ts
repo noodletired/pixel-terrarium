@@ -4,7 +4,7 @@ import { Mask } from '../types/Array2D';
 
 describe('RayTest', () =>
 {
-	test('Top', () =>
+	test('Basic', () =>
 	{
 		const mask = new Mask(3, 3, [
 			...[0, 1, 0],
@@ -19,7 +19,7 @@ describe('RayTest', () =>
 		expect(result.hitCount).toBe(1);
 	});
 
-	test('TopLeft', () =>
+	test('Line - Top Left', () =>
 	{
 		const mask = new Mask(3, 3, [
 			...[0, 1, 0],
@@ -32,7 +32,7 @@ describe('RayTest', () =>
 		expect(result.hitCount).toBe(1);
 	});
 
-	test('TopRight', () =>
+	test('Line - Top Right', () =>
 	{
 		const mask = new Mask(3, 3, [
 			...[0, 1, 0],
@@ -45,7 +45,7 @@ describe('RayTest', () =>
 		expect(result.hitCount).toBe(1);
 	});
 
-	test('BottomLeft', () =>
+	test('Line - Bottom Left', () =>
 	{
 		const mask = new Mask(3, 3, [
 			...[0, 0, 0],
@@ -58,7 +58,7 @@ describe('RayTest', () =>
 		expect(result.hitCount).toBe(1);
 	});
 
-	test('BottomRight', () =>
+	test('Line - Bottom Right', () =>
 	{
 		const mask = new Mask(3, 3, [
 			...[0, 0, 0],
@@ -67,7 +67,29 @@ describe('RayTest', () =>
 		]);
 		const ray = new Vector(1, 0);
 		ray.Rotate(new Degrees(-45));
-		const result = CastRay(mask, 1, 1, ray, true);
-		expect(result.hitCount).toBe(1);
+		const lineResult = CastRay(mask, 1, 1, ray, true);
+		expect(lineResult.hitCount).toBe(1);
+	});
+
+	test('Edge - Bottom Right A', () =>
+	{
+		const mask = new Mask(3, 3, [
+			...[0, 0, 0],
+			...[0, 0, 1],
+			...[0, 0, 0]
+		]);
+		const result = CastRay(mask, 1, 1, new Vector(0.5, -0.5), true);
+		expect(result.hitCount).toBe(0);
+	});
+
+	test('Edge - Bottom Right B', () =>
+	{
+		const mask = new Mask(3, 3, [
+			...[0, 0, 0],
+			...[0, 0, 0],
+			...[0, 1, 0]
+		]);
+		const result = CastRay(mask, 1, 1, new Vector(0.5, -0.5), true);
+		expect(result.hitCount).toBe(0);
 	});
 });
